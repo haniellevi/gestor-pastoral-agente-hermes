@@ -8,7 +8,10 @@ ENV/
 
 # Database (local SQLite files)
 *.db
+*.db.bak
+*.db.*
 *.sqlite3
+
 
 # Logs
 *.log
