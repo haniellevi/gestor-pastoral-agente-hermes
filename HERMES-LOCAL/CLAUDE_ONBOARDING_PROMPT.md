@@ -3,11 +3,25 @@
 
 > [!IMPORTANT]
 > **INSTRUÇÃO DE LEITURA OBRIGATÓRIA PARA O CLAUDE:**
-> Se você é uma nova instância do Claude iniciando este chat, incorpore este documento como sua **Diretriz Mestra e Fonte de Verdade**. Toda e qualquer alteração de código, interação com o Obsidian Vault, consultas ao banco de dados ou conversação com o Pastor deve obedecer rigorosamente a este manual de onboarding.
+> Se você é uma nova instância do Claude iniciando este chat, incorpore este documento como sua **Diretriz Mestra**. Toda e qualquer alteração de código, interação com o Obsidian Vault, consultas ao banco de dados ou conversação com o Pastor deve obedecer rigorosamente a este manual de onboarding.
+
+### 🔑 Hierarquia de Fontes de Verdade (Em caso de conflito)
+Se houver qualquer divergência de regras entre os documentos de documentação do ecossistema:
+1. **[CLAUDE_ONBOARDING_PROMPT.md](file:///c:/Users/hanie/OneDrive/Documentos/WORKSPACE/Projetos%20Locais/Gestao%20Pastoral%20-%20Pr%20Raniel%20Levi/HERMES-LOCAL/CLAUDE_ONBOARDING_PROMPT.md) (Este arquivo):** Manda de forma absoluta na **Arquitetura Geral, Fluxo de Trabalho Técnico, Diretrizes de Segurança (Guardian Engineer) e Protocolo de Sincronização**.
+2. **[AGENTS.md](file:///c:/Users/hanie/OneDrive/Documentos/WORKSPACE/Projetos%20Locais/Gestao%20Pastoral%20-%20Pr%20Raniel%20Levi/HERMES-LOCAL/AGENTS.md):** Manda de forma absoluta nas **Personas, Tons de Voz, Lógicas de Negócio e Comportamento Específico** dos quatro agentes operacionais (Rute, Caleb, Barnabé e Neemias) e no mapeamento de suas tabelas individuais.
 
 ---
 
-## 1. Visão Geral e Contexto do Projeto
+## 1. Status Real e Físico de Implementação do Sistema
+
+Para segurança e ciência do Claude, o estado físico do sistema no disco da máquina local é o seguinte:
+*   **CLAUDE_ONBOARDING_PROMPT.md (Este arquivo):** Existe fisicamente em disco na raiz do repositório Git local e no Obsidian Vault.
+*   **dashboard/app.py:** **Confirmado fisicamente em disco**. Contém 338 linhas de código ativo em Streamlit gerenciando as abas e métricas do Pastor. Não é apenas planejamento nem uma pasta vazia.
+*   **Tabela `delegacoes` e `add_delegacoes.py`:** A migração **foi executada de fato no terminal em 2026-05-26**! A tabela `delegacoes` está ativa de verdade no SQLite local `database/pastoral.db`, contendo as colunas definidas e já preenchida com os registros iniciais (Joaquim, Luciane, Ramon).
+
+---
+
+## 2. Visão Geral e Contexto do Projeto
 
 Este projeto, denominado **HERMES-LOCAL**, é o ecossistema de produtividade, gestão de tempo, inteligência de negócios (BI) e orquestração de agentes de IA desenvolvido localmente para o **Pastor Raniel Levi** (Pastor titular da Igreja Batista Filadélfia Internacional de Corrente-PI). 
 
