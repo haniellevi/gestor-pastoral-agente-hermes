@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS compromissos (
     data_fim TIMESTAMP WITH TIME ZONE NOT NULL,
     descricao TEXT,
     duracao_minutos INTEGER GENERATED ALWAYS AS (EXTRACT(EPOCH FROM (data_fim - data_inicio))/60) STORED,
+    google_event_id VARCHAR(255) UNIQUE,
     criado_em TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

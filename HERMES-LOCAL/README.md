@@ -48,7 +48,35 @@ O Telegram é extremamente fácil e estável de integrar localmente:
 ## 📁 3. Estrutura de Pastas Planejada para o Projeto
 
 Ao longo do desenvolvimento, criaremos os seguintes arquivos nesta pasta:
-*   `/database/` - Scripts de migração SQL para o Supabase.
+*   `/database/` - Scripts de migração SQL.
 *   `/dashboard/` - Código do Dashboard interativo em Streamlit (`app.py`).
 *   `/agents/` - Prompts e arquivos de configuração personalizados para Rute, Caleb, Barnabé e Neemias.
+*   `/integrations/` - Scripts de integração com as APIs do Google.
 *   `run_local.bat` - Script de um clique para iniciar os bots do Hermes e o Dashboard no seu computador simultaneamente.
+
+---
+
+## 📅 4. Integração com Google APIs (Google Calendar, Sheets, Gmail, etc.)
+
+Esta funcionalidade permite que a agente **Rute** sincronize de forma bidirecional a agenda local do SQLite com a do seu celular (Google Calendar), além de preparar o sistema para as próximas integrações.
+
+### Como configurar em 3 passos simples:
+
+1. **Baixe o arquivo de credenciais:**
+   Siga os passos do **Passo 1 — Criar as Credenciais OAuth** enviados pelo Pastor, faça o download do arquivo JSON e salve-o na sua pasta de **Downloads** do Windows (o script irá encontrá-lo automaticamente) ou em outra pasta conhecida.
+
+2. **Execute a Autenticação (OAuth):**
+   Abra o terminal na pasta `HERMES-LOCAL` e execute o comando abaixo (substituindo pelo caminho do seu arquivo JSON caso ele não esteja na pasta de Downloads):
+   ```bash
+   python integrations/google_auth.py --secrets "C:\Caminho\Para\Seu\client_secret_xxxxx.json"
+   ```
+   *Nota: Se o arquivo estiver em Downloads, basta rodar apenas `python integrations/google_auth.py`.*
+   Isso abrirá uma janela no seu navegador solicitando autorização. Faça login com a conta da igreja (`igrejafiladelfiacorrente@gmail.com`) e autorize o aplicativo. Um arquivo de token seguro (`integrations/token.json`) será gerado.
+
+3. **Rode a Sincronização:**
+   Para sincronizar a agenda local com o Google Calendar agora, execute no terminal:
+   ```bash
+   python integrations/google_calendar_sync.py
+   ```
+   Os novos compromissos criados no banco local serão enviados para a agenda Google, e os eventos criados no celular nos últimos 7 dias / próximos 30 dias serão importados para o banco SQLite com categorização automática!
+

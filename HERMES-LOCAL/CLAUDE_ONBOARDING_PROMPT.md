@@ -33,7 +33,7 @@ O sistema visa aliviar a carga operacional e gerencial da rotina pastoral e de s
 
 O ecossistema é baseado em um modelo de **Agentes de IA Especializados** orquestrados pelo agente central **Hermes**, operando sobre um banco de dados SQLite local (`pastoral.db`) e uma base de conhecimento em arquivos Markdown local (RAG Dinâmico).
 
-### 🧜‍♀️ Organograma Lógico de Agentes
+### 🧜♀️ Organograma Lógico de Agentes
 ```mermaid
 graph TD
     User([Pastor Raniel Levi]) <--> |Interface Telegram| Gateway[Hermes Gateway / Telegram Bot]
@@ -120,6 +120,9 @@ HERMES-LOCAL/
 │   ├── caleb_prompt.txt
 │   ├── barnabe_prompt.txt
 │   └── neemias_prompt.txt
+├── integrations/                ← Módulos de integração com APIs externas (Google)
+│   ├── google_auth.py           ← Script de login OAuth e geração do token.json
+│   └── google_calendar_sync.py  ← Lógica de sincronização bidirecional de agenda
 ├── conhecimento/                ← Memória RAG local em Markdown (lida pelos agentes)
 │   ├── agenda_pastoral.md       ← Regras de horários e rotinas do Pastor
 │   ├── igreja_filadelfia.md     ← Estrutura, cultos e líderes da Filadélfia

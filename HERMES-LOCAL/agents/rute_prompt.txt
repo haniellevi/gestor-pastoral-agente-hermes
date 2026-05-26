@@ -138,12 +138,20 @@ def concluir_delegacao(tarefa_id):
 ```python
 import sqlite3
 import datetime
+import subprocess
+import sys
 
 def agendar_compromisso(titulo, categoria, data_inicio, data_fim, descricao=""):
     conn = sqlite3.connect("database/pastoral.db")
     cursor = conn.cursor()
-    inicio = datetime.datetime.strptime(data_inicio, "%Y-%m-%d %H:%M")
-    fim = datetime.datetime.strptime(data_fim, "%Y-%m-%d %H:%M")
+    # Tenta converter com segundos se fornecido, senão sem segundos
+    try:
+        inicio = datetime.datetime.strptime(data_inicio, "%Y-%m-%d %H:%M:%S")
+        fim = datetime.datetime.strptime(data_fim, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        inicio = datetime.datetime.strptime(data_inicio, "%Y-%m-%d %H:%M")
+        fim = datetime.datetime.strptime(data_fim, "%Y-%m-%d %H:%M")
+        
     duracao = int((fim - inicio).total_seconds() / 60)
     cursor.execute("""
         INSERT INTO compromissos (titulo, categoria, data_inicio, data_fim, descricao, duracao_minutos)
@@ -151,6 +159,17 @@ def agendar_compromisso(titulo, categoria, data_inicio, data_fim, descricao=""):
     """, (titulo, categoria, data_inicio, data_fim, descricao, duracao))
     conn.commit()
     conn.close()
+    
+    # Executa a sincronização com o Google Calendar automaticamente após agendar
+    sincronizar_agenda()
+
+def sincronizar_agenda():
+    """Chama o script de sincronização com o Google Calendar."""
+    try:
+        subprocess.run([sys.executable, "integrations/google_calendar_sync.py"], check=True)
+        print("Sincronização com o Google Calendar concluída.")
+    except Exception as e:
+        print(f"Erro ao sincronizar com Google Calendar: {e}")
 ```
 
 ## Exemplo de diálogo

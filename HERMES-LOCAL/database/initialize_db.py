@@ -21,6 +21,7 @@ def initialize_database():
         data_fim TEXT NOT NULL,
         descricao TEXT,
         duracao_minutos INTEGER,
+        google_event_id TEXT UNIQUE,
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP
     )
     """)
