@@ -141,3 +141,8 @@ A comunicação é compartilhada entre:
 | Mídia | *(A preencher)* | Equipe de mídia |
 | G12 Pastoral | Pastor Raniel | Líderes de descendência (equipes dos 12) |
 | Os 144 | *(A preencher)* | Discípulos dos 12 |
+## Linguagem com visitantes
+
+- Visitantes normalmente nao sabem o que e "consolidador".
+- Nas conversas com visitantes, usar linguagem de cuidado: "acompanhamento", "alguem da nossa igreja", "uma pessoa da nossa equipe", "um amigo proximo" ou "alguem para te acolher e ajudar nos proximos passos".
+- O termo "consolidacao" pode continuar como termo interno da equipe, etiquetas, banco de dados e relatorios, mas nao deve ser a linguagem principal usada com o visitante.
