@@ -37,4 +37,6 @@ credentials*.json
 token.json
 .google_token.json
 token_*.json
+screenshot.png
+*.png
 

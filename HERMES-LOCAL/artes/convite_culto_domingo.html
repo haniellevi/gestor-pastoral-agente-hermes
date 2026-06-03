@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convite Culto de Domingo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Inter:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #1a1a1a;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .card {
+    width: 540px;
+    height: 960px;
+    background: linear-gradient(160deg, #0d0d0d 0%, #1a1a1a 40%, #0d0d0d 100%);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+  }
+
+  /* Light overlay texture */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: 
+      radial-gradient(ellipse at 50% 30%, rgba(212, 175, 55, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 70%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  /* Top decorative line */
+  .top-line {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 180px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.6), transparent);
+  }
+
+  /* Decorative corner elements */
+  .corner-tl, .corner-tr, .corner-bl, .corner-br {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-color: rgba(212, 175, 55, 0.2);
+    border-style: solid;
+  }
+  .corner-tl { top: 60px; left: 40px; border-width: 1px 0 0 1px; }
+  .corner-tr { top: 60px; right: 40px; border-width: 1px 1px 0 0; }
+  .corner-bl { bottom: 60px; left: 40px; border-width: 0 0 1px 1px; }
+  .corner-br { bottom: 60px; right: 40px; border-width: 0 1px 1px 0; }
+
+  /* Content */
+  .content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .subtitle {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: rgba(212, 175, 55, 0.7);
+    margin-bottom: 20px;
+  }
+
+  .church-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-size: 18px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 30px;
+  }
+
+  .main-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
+    font-size: 56px;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    color: #D4AF37;
+    line-height: 1.2;
+    text-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+  }
+
+  .main-title span {
+    display: block;
+  }
+
+  .divider {
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+    margin: 30px 0;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .info-item {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 15px;
+    letter-spacing: 3px;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+  }
+
+  .info-item strong {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .info-icon {
+    color: rgba(212, 175, 55, 0.6);
+    margin: 0 4px;
+  }
+
+  .bottom-line {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 180px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .pastor-name {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: rgba(255, 255, 255, 0.35);
+    white-space: nowrap;
+  }
+
+  /* Subtle particles */
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(212, 175, 55, 0.3);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+  }
+  .p1 { top: 20%; left: 15%; animation-delay: 0s; }
+  .p2 { top: 35%; right: 20%; animation-delay: 1s; }
+  .p3 { top: 60%; left: 25%; animation-delay: 2s; }
+  .p4 { top: 75%; right: 15%; animation-delay: 3s; }
+  .p5 { top: 45%; left: 10%; animation-delay: 4s; }
+  .p6 { top: 25%; right: 30%; animation-delay: 5s; }
+
+  @keyframes float {
+    0%, 100% { opacity: 0.2; transform: translateY(0); }
+    50% { opacity: 0.6; transform: translateY(-15px); }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="corner-tl"></div>
+  <div class="corner-tr"></div>
+  <div class="corner-bl"></div>
+  <div class="corner-br"></div>
+  <div class="top-line"></div>
+  <div class="bottom-line"></div>
+
+  <div class="particle p1"></div>
+  <div class="particle p2"></div>
+  <div class="particle p3"></div>
+  <div class="particle p4"></div>
+  <div class="particle p5"></div>
+  <div class="particle p6"></div>
+
+  <div class="content">
+    <div class="subtitle">Você é nosso convidado</div>
+    <div class="church-name">Igreja Batista Filadélfia Internacional</div>
+    <div class="divider"></div>
+    <div class="main-title">
+      <span>Culto de</span>
+      <span>Domingo</span>
+    </div>
+    <div class="divider"></div>
+    <div class="info">
+      <div class="info-item"><strong>Domingo</strong> <span class="info-icon">✦</span> <strong>19h30</strong></div>
+      <div class="info-item" style="font-size:12px; letter-spacing:2px; margin-top:4px; color:rgba(255,255,255,0.45);">
+        Rua Coronel Verçosa, 224 — Centro — Corrente-PI
+      </div>
+    </div>
+  </div>
+
+  <div class="pastor-name">Pr. Raniel Levi</div>
+</div>
+</body>
+</html>

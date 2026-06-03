@@ -14,6 +14,9 @@ __pycache__/
 
 database/*.db
 database/*.db-*
+database/export_botconversa_completo.json
+database/export_progress.txt
+screenshot.png
 *.log
 startup_log.txt
 knowledge_sync.log

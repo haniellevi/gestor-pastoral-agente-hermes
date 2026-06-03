@@ -1,0 +1,163 @@
+# Calendario 2026
+
+Fonte principal: `conhecimento/calendario_2026.md`.
+
+## Estrutura semanal fixa
+
+| Dia | Programacao |
+|---|---|
+| Segunda | Folga pastoral na agenda do Pastor; nao agendar compromissos externos |
+| Terca 19h30 | Celulas / reuniao G12 conforme agenda pastoral |
+| Quarta 19h30 | Quartas de Fe |
+| Quinta | Universidade da Vida / Capacitacao Destino / Treinamentos |
+| Sexta | Intercessao / Celulas / Ensaio Ministerio de Artes |
+| Sabado | Rede Jovem no 1º e 3º sabado / Rede de Casais no 2º sabado |
+| Domingo | Culto de Primicias no 1º domingo / Culto da Familia |
+
+Observacao de fonte: `conhecimento/calendario_2026.md` menciona "Segunda | G12 Pastoral", mas `conhecimento/agenda_pastoral.md` define segunda como folga pastoral e registra reuniao G12 na terca as 19h30. Para atendimento publico, a Rute nao deve afirmar reuniao G12 na segunda sem confirmacao da secretaria/pastor.
+
+## Meses e temas de 2026
+
+| Mes | Tema |
+|---|---|
+| Janeiro | Visao Ampliada |
+| Fevereiro | Forca para Conquistar |
+| Marco | Tomando Posse do Territorio |
+| Abril | Alargar as Tendas |
+| Maio | Restauracao Total |
+| Junho | Colheita Abundante |
+| Julho | Sabedoria |
+| Agosto | Promessas Cumpridas |
+| Setembro | Uncao de Governo e Lideranca |
+| Outubro | Rompimento Sobrenatural |
+| Novembro | Frutificacao |
+| Dezembro | Testemunhos |
+
+## Eventos confirmados por mes
+
+### Marco
+
+- 01/03: Culto de Primicias.
+- 04/03: Inicio da campanha Conquista de Territorios.
+- 07/03: TED - Treinamento Especial de Discipulado.
+- 08/03: Culto Especial Dia da Mulher.
+- 14/03: Rede Jovem.
+- 21/03: Rede de Casais.
+- 23 a 27/03: Semana de Santificacao.
+- 28/03: Rede de Mulheres.
+- 29/03: Lancamento O3M Ciclo 1.
+- 30/03: Inicio Semana 1 da O3M.
+
+### Abril
+
+- 01/04: Inicio da campanha O Poder do Sangue de Jesus.
+- 04/04: Rede Jovem.
+- 05/04: Culto de Primicias 9h - Domingo de Pascoa.
+- 06/04: Inicio Semana 2 da O3M.
+- 11/04: Rede de Casais.
+- 13/04: Inicio Semana 3 da O3M.
+- 18/04: Rede Jovem.
+- 20/04: Inicio Semana 4 da O3M.
+- 26/04: Festa da Colheita.
+- 27/04: Inicio Semana de Consolidacao.
+
+### Maio
+
+- Mes marcado como concluido.
+- 28/05: Reuniao com os 12; pauta registrada: O3M Ciclo 2, Inicio CD, Convencao G12 Brasil.
+- 31/05: Planejamento O3M Ciclo 2 cancelado.
+
+### Junho
+
+- O3M Ciclo 2 cancelado.
+- Familia no Altar ja ocorreu.
+- CD com inicio a decidir conforme reuniao registrada.
+- 06/06: Rede Jovem.
+- 07/06: Culto de Primicias.
+- 13/06: Rede de Casais.
+- 20/06: Rede Jovem.
+
+### Julho
+
+- 01/07: Inicio da campanha Sabedoria e Prosperidade.
+- 04/07: Rede Jovem.
+- 05/07: Culto de Primicias.
+- 11/07: Rede de Casais.
+- 18/07: Rede Jovem.
+- 26/07 a 01/08: Convencao G12 Brasil em Teresina; caravana da Filadelfia.
+
+### Agosto
+
+- 02/08: Culto de Primicias.
+- 05/08: Inicio da campanha Financas Restauradas.
+- 08/08: Rede Jovem.
+- 09/08: Aniversario da Pastora Vanessa.
+- 13/08: Aniversario do Pastor Raniel.
+- 15/08: Rede de Casais.
+- 22/08: Rede Jovem.
+
+### Setembro
+
+- 02/09: Inicio da campanha Lidere como Jesus.
+- 03/09: Universidade da Vida - Aula 1.
+- 05/09: Rede Jovem.
+- 10/09: Universidade da Vida - Aula 2.
+- 12/09: Rede de Casais.
+- 17/09: Universidade da Vida - Aula 3.
+- 19/09: Rede Jovem.
+- 24/09: Universidade da Vida - Aula 4.
+
+### Outubro
+
+- 02 a 04/10: Encontro com Deus.
+- 04/10: Culto de Primicias a noite.
+- 07/10: Inicio da campanha Rompimento Sobrenatural.
+- 08/10: Universidade da Vida - Aula 5.
+- 10/10: Rede Jovem.
+- 15/10: Universidade da Vida - Aula 6.
+- 17/10: Rede de Casais.
+- 22/10: Universidade da Vida - Aula 7.
+- 24/10: Rede Jovem.
+- 29/10: Universidade da Vida - Aula 8.
+- 31/10: Festa das Aguas as 16h.
+
+### Novembro
+
+- 01/11: Culto de Primicias.
+- 04/11: Inicio da campanha Frutiferos.
+- 05/11: Inicio da nova turma da Capacitacao Destino.
+- 07/11: Rede Jovem.
+- 11/11: Saida do onibus para Convencao Filadelfia em Teresina.
+- 12 a 14/11: Convencao Filadelfia.
+- 20/11: Chegada da caravana em Corrente.
+- 21/11: Rede de Casais.
+- 28/11: Rede Jovem.
+- Lembrete: novembro e o mes de planejar o calendario de 2027.
+
+### Dezembro
+
+- 02/12: Inicio da campanha Gratos e Abencoados.
+- 05/12: Confra dos Jovens.
+- 06/12: Culto de Primicias.
+- 06/12: Dia 1 - Profetizando 2027.
+- 12/12: Festa do Dia do Discipulador.
+- 13/12: Dia 2 - Profetizando 2027.
+- 19/12: Confra dos Casais.
+- 20/12: Dia 3 - Profetizando 2027.
+- 27/12: Dia 4 - Profetizando 2027.
+- 31/12: Culto da Virada.
+
+## Datas especiais fixas
+
+| Data | Evento |
+|---|---|
+| 09 de agosto | Aniversario da Pastora Vanessa |
+| 13 de agosto | Aniversario do Pastor Raniel |
+| Ultima semana de julho | Convencao G12 Brasil em Teresina |
+| Novembro, semana 2 | Convencao Filadelfia em Teresina |
+| 12 de dezembro | Festa do Dia do Discipulador |
+| 31 de dezembro | Culto da Virada |
+
+## Regra para a Rute
+
+Se o evento nao estiver confirmado neste arquivo, a Rute deve encaminhar para secretaria.

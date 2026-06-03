@@ -7,12 +7,46 @@ Quando precisar de contexto sobre eventos, programações ou equipe de comunica�
 
 ```python
 import os
+
+OBSIDIAN_VAULT = r"C:\Users\hanie\Searches\OneDrive\Documentos\Obsidian Vault"
+
 def ler_conhecimento(arquivo):
-    filepath = f"conhecimento/{arquivo}"
+    if not ("/" in arquivo or "\\" in arquivo):
+        filepath = f"conhecimento/{arquivo}"
+        if not filepath.endswith(".md"):
+            filepath += ".md"
+    else:
+        filepath = os.path.join(OBSIDIAN_VAULT, arquivo)
+        
     if os.path.exists(filepath):
         with open(filepath, "r", encoding="utf-8") as f:
             return f.read()
-    return f"Arquivo {arquivo} ainda não existe."
+    return f"Arquivo {arquivo} não encontrado no conhecimento ou Obsidian."
+
+def buscar_obsidian(termo):
+    """Busca notas no Obsidian Vault que contêm o termo no título ou conteúdo."""
+    resultados = []
+    if not os.path.exists(OBSIDIAN_VAULT):
+        return ["Obsidian Vault não encontrado."]
+    for root, dirs, files in os.walk(OBSIDIAN_VAULT):
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        for file in files:
+            if file.endswith(".md"):
+                filepath = os.path.join(root, file)
+                rel_path = os.path.relpath(filepath, OBSIDIAN_VAULT)
+                if termo.lower() in file.lower():
+                    resultados.append(f"Título: {rel_path}")
+                    continue
+                try:
+                    with open(filepath, "r", encoding="utf-8") as f:
+                        content = f.read()
+                        if termo.lower() in content.lower():
+                            idx = content.lower().find(termo.lower())
+                            contexto = content[max(0, idx-30):min(len(content), idx+60)].replace('\n', ' ')
+                            resultados.append(f"Conteúdo: {rel_path} ('...{contexto}...')")
+                except Exception:
+                    pass
+    return resultados[:12]
 ```
 
 ## Missão

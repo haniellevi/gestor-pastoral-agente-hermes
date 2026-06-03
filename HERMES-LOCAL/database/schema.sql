@@ -89,3 +89,27 @@ CREATE TABLE IF NOT EXISTS consolidacao_visitantes (
     criado_em TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- 8. CENTRAL HERMES DE MEMBROS E ATENDIMENTO (Rute)
+CREATE TABLE IF NOT EXISTS atendimentos_rute (
+    id SERIAL PRIMARY KEY,
+    pessoa_nome VARCHAR(150) NOT NULL,
+    telefone VARCHAR(30),
+    tipo_solicitacao VARCHAR(50) CHECK (tipo_solicitacao IN (
+        'Atualizacao Cadastro',
+        'Informacao Visitante',
+        'Pedido Oracao',
+        'Pedido Aconselhamento',
+        'Entrar Celula',
+        'Humano Necessario',
+        'Outro'
+    )) DEFAULT 'Outro',
+    origem VARCHAR(30) CHECK (origem IN ('BotConversa', 'Dashboard', 'Telegram', 'Manual', 'Outro')) DEFAULT 'Manual',
+    nivel_urgencia VARCHAR(20) CHECK (nivel_urgencia IN ('Baixa', 'Normal', 'Alta', 'Urgente')) DEFAULT 'Normal',
+    status VARCHAR(30) CHECK (status IN ('Novo', 'Em triagem', 'Encaminhado', 'Resolvido', 'Arquivado')) DEFAULT 'Novo',
+    responsavel VARCHAR(100),
+    resumo TEXT,
+    membro_id INTEGER REFERENCES membros(id),
+    botconversa_subscriber_id INTEGER,
+    criado_em TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    atualizado_em TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);

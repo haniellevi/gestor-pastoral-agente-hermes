@@ -125,6 +125,33 @@ def migrate() -> None:
     """)
 
     cursor.execute("""
+    CREATE TABLE IF NOT EXISTS atendimentos_rute (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        pessoa_nome TEXT NOT NULL,
+        telefone TEXT,
+        tipo_solicitacao TEXT CHECK (tipo_solicitacao IN (
+            'Atualizacao Cadastro',
+            'Informacao Visitante',
+            'Pedido Oracao',
+            'Pedido Aconselhamento',
+            'Entrar Celula',
+            'Humano Necessario',
+            'Outro'
+        )) DEFAULT 'Outro',
+        origem TEXT CHECK (origem IN ('BotConversa', 'Dashboard', 'Telegram', 'Manual', 'Outro')) DEFAULT 'Manual',
+        nivel_urgencia TEXT CHECK (nivel_urgencia IN ('Baixa', 'Normal', 'Alta', 'Urgente')) DEFAULT 'Normal',
+        status TEXT CHECK (status IN ('Novo', 'Em triagem', 'Encaminhado', 'Resolvido', 'Arquivado')) DEFAULT 'Novo',
+        responsavel TEXT,
+        resumo TEXT,
+        membro_id INTEGER,
+        botconversa_subscriber_id INTEGER,
+        criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+        atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (membro_id) REFERENCES membros(id)
+    )
+    """)
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS comunicacoes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         titulo TEXT NOT NULL,

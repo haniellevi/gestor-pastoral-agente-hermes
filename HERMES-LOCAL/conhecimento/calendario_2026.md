@@ -6,7 +6,7 @@
 | Segunda | G12 Pastoral (reunião líderes de descendência) |
 | Terça 19h30 | Células |
 | Quarta 19h30 | Quartas de Fé (culto) |
-| Quinta | Universidade da Vida / Capacitação Destino / Treinamentos |
+| Quinta | Universidade da Vida / ~~Capacitação Destino~~ *(CD ainda não iniciou)* / Treinamentos |
 | Sexta | Intercessão / Células / Ensaio Ministério de Artes |
 | Sábado | Rede Jovem (1º e 3º) / Rede de Casais (2º sábado) |
 | Domingo | Culto de Primícias (1º domingo) / Culto da Família |
@@ -45,30 +45,29 @@
 - 26 – Festa da Colheita
 - 27 – Início Semana de Consolidação
 
-## MAIO — RESTAURAÇÃO TOTAL
-- 01 – Dia do Trabalhador
-- 03 – Culto de Primícias
-- 06 – Continuação da Campanha: O Poder do Sangue de Jesus
-- 09 – Rede Jovem
-- 10 – Dia das Mães
-- 16 – Rede de Casais
-- 23 – Rede Jovem
-- 25–30 – Semana de Santificação
-- 31 – Lançamento O3M Ciclo 2
+## MAIO — RESTAURAÇÃO TOTAL ✅
+|*(concluído)*|
+|-
+|- 01 – Dia do Trabalhador
+|- 03 – Culto de Primícias
+|- 06 – Continuação da Campanha: O Poder do Sangue de Jesus
+|- 09 – Rede Jovem
+|- 10 – Dia das Mães
+|- 16 – Rede de Casais
+|- 23 – Rede Jovem
+|- 25–30 – Semana de Santificação
+|- **28 (QUINTA) – Reunião com os 12 — Pauta: O3M Ciclo 2 (células), Início CD, Convenção G12 Brasil**
+|- ~~31 – Planejamento O3M Ciclo 2~~ ❌ cancelado
 
 ## JUNHO — COLHEITA ABUNDANTE
-- 01 – Semana 1 O3M
-- 03 – Início da Campanha: Família no Altar
+> 📌 **ATUALIZAÇÃO: O3M Ciclo 2 cancelado. Família no Altar já ocorreu. CD (Capacitação Destino) com início a decidir na reunião de hoje.**
+
+- ~~03 – Início da Campanha: Família no Altar~~ ✅ já teve
 - 06 – Rede Jovem
 - 07 – Culto de Primícias
-- 08 – Semana 2 O3M
+
 - 13 – Rede de Casais
-- 15 – Semana 3 O3M
 - 20 – Rede Jovem
-- 22 – Semana 4 O3M
-- 27 – Dia do Convite para Colheita
-- 28 – Festa da Colheita Ciclo 2
-- 29 – Semana de Consolidação
 
 ## JULHO — SABEDORIA
 - 01 – Início da Campanha: Sabedoria e Prosperidade
@@ -76,6 +75,8 @@
 - 05 – Culto de Primícias
 - 11 – Rede de Casais
 - 18 – Rede Jovem
+- **26 jul – 01 ago — Convenção G12 Brasil em Teresina 🚌**
+  > Caravana da Filadélfia para a Convenção Nacional G12.
 
 ## AGOSTO — PROMESSAS CUMPRIDAS
 - 02 – Culto de Primícias
@@ -140,6 +141,7 @@
 |------|--------|
 | 09 de agosto | Aniversário da Pastora Vanessa |
 | 13 de agosto | Aniversário do Pastor Raniel |
-| Novembro (semana 2) | Convenção Filadélfia (em Teresina) |
+| Última semana de julho | Convenção G12 Brasil (Teresina — data móvel) |
+| Novembro (semana 2) | Convenção Filadélfia (Teresina) |
 | 12 de dezembro | Festa do Dia do Discipulador |
 | 31 de dezembro | Culto da Virada |

@@ -213,6 +213,36 @@ Google Drive
 
 Nesta fase, a atualização constante será por tarefa recorrente a cada 15 minutos na VPS. Depois que o domínio HTTPS estiver propagado e estável, podemos adicionar webhook oficial do Google Drive. Pela documentação oficial do Google Drive API, notificações push exigem uma URL HTTPS de callback e os canais de notificação têm expiração, então precisam ser renovados periodicamente.
 
+### 4.7 Planejamento colaborativo por módulo
+
+O Plano Mestre será desenvolvido e refinado em ciclos de conversa com o Pastor Raniel.
+
+Cada módulo do projeto deve ser lapidado com:
+
+- referências enviadas pelo Pastor;
+- explicação da prática real da igreja;
+- dores que precisam ser resolvidas;
+- fluxos atuais e fluxos desejados;
+- regras pastorais, operacionais e de segurança;
+- decisões registradas;
+- pendências explícitas;
+- atualização dos documentos oficiais.
+
+Exemplos:
+
+- no módulo `Site da igreja`, o Pastor pode explicar as páginas desejadas, referências visuais, tom, fotos, chamadas e integrações;
+- no módulo `Consolidação`, o Pastor deve ensinar como a igreja acompanha visitantes, novos convertidos, líderes responsáveis, prazos e etapas;
+- no módulo `Células/G12`, o Pastor deve explicar como funcionam relatórios, redes, líderes, frequência e acompanhamento;
+- no módulo `Financeiro`, o Pastor deve explicar categorias, permissões, relatórios e limites de acesso.
+
+Regra:
+
+```text
+Nenhum módulo deve ser tratado como definitivo sem passar pela explicação real da igreja e validação do Pastor.
+```
+
+O método oficial está registrado em `docs/METODO_PLANEJAMENTO_COLABORATIVO.md`.
+
 ---
 
 ## 5. Arquitetura alvo
@@ -422,7 +452,7 @@ O projeto já possui uma base local funcional. A próxima etapa não é começar
 | Webhook local | `integrations/webhook_server.py` | Endpoint cadastral atual |
 | Google Calendar | `integrations/google_calendar_sync.py` | Sincronização local com agenda Google |
 | Watch de conhecimento | `integrations/watch_knowledge.py` | Base para monitoramento local |
-| Planejamento BotConversa | `docs/planejamento_completo_fluxos_botconversa_hermes.md` | Detalhamento dos fluxos |
+| Planejamento BotConversa | `docs/_apoio_botconversa/planejamento_completo_fluxos_botconversa_hermes.md` | Detalhamento dos fluxos |
 | Base Rute | `docs/base_conhecimento_rute/` | Textos para alimentar a Rute |
 
 Decisão:

@@ -1,0 +1,222 @@
+VISAO G12 E CELULAS
+===================
+
+---
+FONTE: 04_visao_g12.md
+---
+
+# Visao G12
+
+## O que e a Visao G12 na Filadelfia
+
+A Visao G12 e o modelo de crescimento e discipulado da Igreja Filadelfia. O principio registrado e que cada crente deve ganhar 12 pessoas para Cristo, discipula-las e envia-las para ganhar outras 12.
+
+O crescimento e em rede:
+
+```text
+Familia Pastoral
+  -> Lideres de descendencia
+      -> Os 144
+          -> Lideres de celula
+              -> Membros e visitantes
+```
+
+## Escada do Sucesso
+
+```text
+GANHAR -> CONSOLIDAR -> DISCIPULAR -> ENVIAR
+```
+
+## 1. Ganhar
+
+O processo comeca na oracao: antes de falar de Jesus para as pessoas, a igreja ora por elas.
+
+### O3M - Oracao por Tres Mensal
+
+- Durante um mes, o membro ora por 3 pessoas especificas.
+- Ha contatos semanais com essas pessoas.
+- Semana 1: primeiro contato.
+- Semana 2: segundo contato, servindo ou ajudando a pessoa.
+- Semana 3: terceiro contato, convidando para festa/celula/colheita.
+- Semana 4: colheita.
+- O calendario anual define os ciclos de O3M e as Festas da Colheita.
+
+### CVS - Cadeira Vazia Semanal
+
+- Estrategia continua nas celulas.
+- Meta: 1 visitante novo por celula por semana.
+- O lider usa uma cadeira vazia como sinal profetico e pratico de evangelismo.
+
+## 2. Consolidar
+
+Consolidacao e o cuidado com o novo crente para que permaneca e cresca.
+
+### Processo AAA
+
+1. ASSEGURE
+   - Fichas na porta.
+   - Equipe de consolidacao no culto.
+   - Salão de Consolidacao.
+   - Fonovisita em ate 24h.
+   - Visita presencial em ate 72h apos a fonovisita.
+   - Insercao em celula.
+
+2. ACOMPANHE
+   - Acompanhar por 4 semanas consecutivas em culto, celula e Universidade da Vida.
+
+3. AFIANCE
+   - Levar ao Encontro com Deus.
+
+Responsavel registrada pela consolidacao: Luciane.
+
+## 3. Discipular
+
+Discipulado e pessoal e intencional.
+
+### DPI - Discipulado Pessoal Intencional
+
+Avaliacao pelos 4Fs:
+
+- Fundamento: relacao com Deus.
+- Familia: relacao com a familia.
+- Financas: dividas, dizimos e organizacao financeira.
+- Formacao: etapa ministerial, UV, CD, celula, 12, 144.
+
+## Trilha de formacao
+
+1. Celula
+2. Universidade da Vida (UV)
+3. Encontro com Deus
+4. Pos-encontro
+5. Escola de Lideres - Nivel 1
+6. Escola de Lideres - Nivel 2 + Reencontro
+7. Escola de Lideres - Nivel 3
+8. Escola Ministerial
+9. Escola de Mestres
+10. Enviar
+
+## Capacitacao Destino
+
+- Curso de formacao de lideranca da igreja.
+- Acontece as quintas.
+- Pre-requisito para abertura de celula: estar cursando o 2º modulo ou superior.
+
+## Quem nao pode ser lider de celula
+
+Conforme registro em `conhecimento/visao_g12.md`, nao pode ser lider de celula:
+
+- quem nao e batizado;
+- quem nao e casado e vive junto;
+- quem nao esta no 2º modulo da Capacitacao Destino ou superior;
+- quem e rebelde;
+- quem nao e dizimista;
+- quem nao manifesta os frutos do Espirito.
+
+## 4. Enviar
+
+O lider e ungido para abrir sua propria celula apos concluir o Nivel 2 da Escola de Lideres e o Reencontro.
+
+## Siglas
+
+| Sigla/termo | Significado |
+|---|---|
+| O3M | Oracao por Tres Mensal |
+| CVS | Cadeira Vazia Semanal |
+| UV | Universidade da Vida |
+| CD | Capacitacao Destino |
+| DPI | Discipulado Pessoal Intencional |
+| TED | Treinamento Especial de Discipulado |
+| AAA | Assegure, Acompanhe, Afiance |
+| G12 | Os 12 discipulos diretos do pastor/pastora |
+| Os 144 | Discipulos dos lideres de descendencia |
+| Festa da Colheita | Culto especial ao fim de um ciclo O3M |
+| Semana de Consolidacao | Semana apos a Festa da Colheita |
+| Reencontro | Segundo encontro; marca o discipulo pronto para abrir celula |
+
+
+---
+FONTE: 05_celulas.md
+---
+
+# Celulas
+
+## O que e celula
+
+A celula e a unidade basica de crescimento da igreja e o lugar onde o discipulado acontece na pratica.
+
+## Tipos de celula
+
+| Tipo | Foco | Publico |
+|---|---|---|
+| Aberta | Multiplicacao e evangelismo | Descrentes e visitantes |
+| Fechada | Edificacao e treinamento | Membros/G12 |
+
+## Integrantes da celula
+
+- Lider: treinado, compartilha a mensagem e tem meta de ganhar 1 pessoa por semana.
+- Anfitriao: disponibiliza o espaco, participa da visao e deve ser pastoreado/honrado.
+- Assistentes/convidados: pessoas convidadas para ouvir a mensagem.
+
+## Programacao da reuniao de celula
+
+1. Saudacao, introducao e oracao - 3 min.
+2. Momento de reflexao/louvor - 10 min.
+3. Mensagem central - 15 min.
+4. Oracao principal - 3 min.
+5. Oferta - 5 min.
+6. Cadeira Vazia - 5 min.
+7. Oracao de despedida - 3 min.
+8. Avisos - 2 min.
+9. Lanche/comunhao.
+
+## Fatores de multiplicacao
+
+1. Convite constante.
+2. Comunhao entre os membros.
+3. Pastoreio do lider.
+4. Mentoreamento.
+5. Capacitacao continua.
+
+## Agenda semanal relacionada
+
+Conforme `conhecimento/calendario_2026.md` e `conhecimento/agenda_pastoral.md`:
+
+- Terca 19h30: celulas / reuniao G12 conforme organizacao dos lideres.
+- Sexta: intercessao, celulas ou ensaio do Ministerio de Artes.
+- Sabado: celulas e redes, incluindo Rede Jovem e Rede de Casais conforme calendario mensal.
+
+## Como a Rute deve lidar com pedidos sobre celula
+
+Se alguem quer participar de uma celula:
+
+1. Acolher.
+2. Perguntar bairro/cidade.
+3. Perguntar disponibilidade.
+4. Perguntar se ja tem lider/celula.
+5. Aplicar etiqueta `Célula`.
+6. Se for visitante, aplicar tambem `Consolidação 24h`.
+7. Encaminhar para Caleb/central de celulas/lideranca responsavel.
+
+Mensagem modelo:
+
+```text
+Graça e Paz! Que alegria saber do seu interesse em participar de uma celula.
+
+Para eu encaminhar melhor, me diga:
+*Bairro/cidade:*
+*Melhor dia/horario:*
+*Voce ja conhece algum lider de celula?*
+```
+
+## Relatorios de celula
+
+Relatorios devem ser tratados pelo Caleb/Hermes, nao apenas pela Rute. Dados principais:
+
+- nome da celula;
+- lider;
+- presenca de membros;
+- visitantes;
+- decisoes de fe;
+- rede.
+
+

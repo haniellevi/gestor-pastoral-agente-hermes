@@ -111,116 +111,36 @@ def initialize_database():
         criado_em TEXT DEFAULT CURRENT_TIMESTAMP
     )
     """)
+
+    # 8. Central Hermes de Membros e Atendimento (Rute)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS atendimentos_rute (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        pessoa_nome TEXT NOT NULL,
+        telefone TEXT,
+        tipo_solicitacao TEXT CHECK (tipo_solicitacao IN (
+            'Atualizacao Cadastro',
+            'Informacao Visitante',
+            'Pedido Oracao',
+            'Pedido Aconselhamento',
+            'Entrar Celula',
+            'Humano Necessario',
+            'Outro'
+        )) DEFAULT 'Outro',
+        origem TEXT CHECK (origem IN ('BotConversa', 'Dashboard', 'Telegram', 'Manual', 'Outro')) DEFAULT 'Manual',
+        nivel_urgencia TEXT CHECK (nivel_urgencia IN ('Baixa', 'Normal', 'Alta', 'Urgente')) DEFAULT 'Normal',
+        status TEXT CHECK (status IN ('Novo', 'Em triagem', 'Encaminhado', 'Resolvido', 'Arquivado')) DEFAULT 'Novo',
+        responsavel TEXT,
+        resumo TEXT,
+        membro_id INTEGER,
+        botconversa_subscriber_id INTEGER,
+        criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+        atualizado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (membro_id) REFERENCES membros(id)
+    )
+    """)
     
-    # Inserindo dados iniciais (Seed Data) se as tabelas estiverem vazias
-    
-    # Seed Compromissos
-    cursor.execute("SELECT COUNT(*) FROM compromissos")
-    if cursor.fetchone()[0] == 0:
-        hoje = datetime.now()
-        amanha = hoje + timedelta(days=1)
-        dados_compromissos = [
-            ('Aconselhamento Lucas e Ana', 'Aconselhamento', hoje.strftime('%Y-%m-%d 14:00:00'), hoje.strftime('%Y-%m-%d 15:30:00'), 'Aconselhamento sobre vida familiar e liderança de célula.', 90),
-            ('Reunião de Liderança G12', 'Reuniao Lideranca', hoje.strftime('%Y-%m-%d 19:30:00'), hoje.strftime('%Y-%m-%d 21:00:00'), 'Reunião mensal com os 12 da primeira geração.', 90),
-            ('Estudo da Palavra e Esboço', 'Estudo/Sermao', amanha.strftime('%Y-%m-%d 09:00:00'), amanha.strftime('%Y-%m-%d 11:30:00'), 'Preparação do esboço para o culto de Domingo.', 150),
-            ('Culto de Celebração Domingo', 'Culto', (hoje + timedelta(days=5)).strftime('%Y-%m-%d 18:00:00'), (hoje + timedelta(days=5)).strftime('%Y-%m-%d 20:00:00'), 'Pregação principal da série sobre Neemias.', 120)
-        ]
-        cursor.executemany("""
-        INSERT INTO compromissos (titulo, categoria, data_inicio, data_fim, descricao, duracao_minutos)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """, dados_compromissos)
-        print("Dados iniciais de compromissos inseridos.")
-        
-    # Seed Relatorios Celulas
-    cursor.execute("SELECT COUNT(*) FROM relatorios_celulas")
-    if cursor.fetchone()[0] == 0:
-        dados_celulas = [
-            ('2026-05-18', 'Shammah', 'Lucas Silva', 10, 1, 1, 'Jovens'),
-            ('2026-05-19', 'Ebenézer', 'Ana Santos', 8, 2, 0, 'Casais'),
-            ('2026-05-20', 'Peniel', 'Marcos Oliveira', 12, 0, 2, 'Homens'),
-            ('2026-05-21', 'Manassés', 'Gabriel Souza', 7, 3, 1, 'Jovens'),
-            ('2026-05-22', 'Sara', 'Carla Lima', 9, 2, 0, 'Mulheres'),
-            ('2026-05-25', 'Shammah', 'Lucas Silva', 12, 2, 1, 'Jovens'),
-            ('2026-05-25', 'Ebenézer', 'Ana Santos', 9, 1, 0, 'Casais')
-        ]
-        cursor.executemany("""
-        INSERT INTO relatorios_celulas (data_relatorio, nome_celula, lider_nome, presenca_membros, visitantes, decisoes_fe, rede)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, dados_celulas)
-        print("Dados iniciais de relatórios de células inseridos.")
-        
-    # Seed Metas Diarias (Neemias)
-    cursor.execute("SELECT COUNT(*) FROM metas_diarias")
-    if cursor.fetchone()[0] == 0:
-        dados_metas = [
-            ((datetime.now() - timedelta(days=2)).strftime('%Y-%m-%d'), 'Gravar Reels sobre G12', 1, 'Visitar célula dos Jovens', 1, 'Estudar 1h livro de Castellanos', 1, 100, 'Dia excelente e focado.'),
-            ((datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d'), 'Preparar esboço da mensagem', 1, 'Aconselhar casal Marcos e Júlia', 0, 'Ler 30min sobre liderança', 1, 60, 'O aconselhamento foi adiado pelo casal.'),
-            (datetime.now().strftime('%Y-%m-%d'), 'Fazer caminhada matinal', 1, 'Reunião com liderança de rede', 1, 'Finalizar roteiros com Barnabé', 1, 100, 'Meta de saúde e ministério batidas.')
-        ]
-        cursor.executemany("""
-        INSERT INTO metas_diarias (data, vitoria_1, vitoria_1_concluida, vitoria_2, vitoria_2_concluida, vitoria_3, vitoria_3_concluida, pontuacao_dia, anotacoes)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, dados_metas)
-        print("Dados iniciais de metas diárias inseridos.")
-        
-    # Seed Posts Conteudo (Barnabe)
-    cursor.execute("SELECT COUNT(*) FROM posts_conteudo")
-    if cursor.fetchone()[0] == 0:
-        dados_posts = [
-            ('Por que líderes G12 não agem sozinhos?', 'Reels', 'Roteiro pronto sobre descentralização e delegação baseado em Jesus e seus 12.', 'Postado', 15200, 480, '2026-05-15'),
-            ('O que a muralha de Neemias nos ensina sobre limites?', 'Shorts', 'Vídeo rápido sobre foco e dizer não para distrações.', 'Postado', 8400, 230, '2026-05-18'),
-            ('Os 3 segredos para um aconselhamento pastoral eficaz', 'Carrossel', 'Infográfico detalhado contendo pautas de aconselhamento.', 'Roteirizado', 0, 0, None),
-            ('Como vencer o desânimo espiritual na segunda-feira', 'Mensagem Interna', 'Texto motivacional curto para grupos de WhatsApp.', 'Postado', 400, 50, '2026-05-25'),
-            ('Princípios bíblicos da Conquista Financeira', 'Reels', 'Roteiro sobre mordomia cristã e metas financeiras.', 'Ideia', 0, 0, None)
-        ]
-        cursor.executemany("""
-        INSERT INTO posts_conteudo (tema, tipo, roteiro, status, views, engajamento, data_publicacao)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, dados_posts)
-        print("Dados iniciais de conteúdo editorial inseridos.")
-        
-    # Seed Sugestoes BI (Hermes)
-    cursor.execute("SELECT COUNT(*) FROM sugestoes_bi")
-    if cursor.fetchone()[0] == 0:
-        dados_sugestoes = [
-            ('Aconselhamentos sobre casais', 'Índice de Saúde Familiar (Frequência em Casais)', 'Detecção de aumento de 40% nas menções de problemas conjugais nos aconselhamentos.', 'Pendente'),
-            ('Reuniões de Jovens', 'Taxa de Retenção de Jovens (Batismos/Célula)', 'Queda de 15% na retenção de jovens convertidos nas primeiras 4 semanas.', 'Implementado'),
-            ('Escola de Líderes', 'Tempo Médio para Formação de Líder (Meses)', 'Análise de gargalo no tempo de conclusão do módulo 3 da Escola.', 'Pendente')
-        ]
-        cursor.executemany("""
-        INSERT INTO sugestoes_bi (origem_conversa, metrica_sugerida, justificativa, status)
-        VALUES (?, ?, ?, ?)
-        """, dados_sugestoes)
-        print("Dados iniciais de sugestões de BI inseridos.")
-        
-    # Seed Registro Procrastinação (Neemias)
-    cursor.execute("SELECT COUNT(*) FROM registro_procrastinacao")
-    if cursor.fetchone()[0] == 0:
-        dados_procrastinacao = [
-            ('2026-05-22', 'Preparar sermão de Domingo', 'Redes Sociais e e-mails administrativos'),
-            ('2026-05-24', 'Gravação dos Reels semanais', 'Urgência administrativa na secretaria'),
-            ('2026-05-25', 'Estudo inegociável de 1h', 'Cansaço físico e reuniões prolongadas')
-        ]
-        cursor.executemany("""
-        INSERT INTO registro_procrastinacao (data, tarefa_adiada, distracao)
-        VALUES (?, ?, ?)
-        """, dados_procrastinacao)
-        print("Dados iniciais de procrastinação inseridos.")
-        
-    # Seed Consolidação Visitantes (Caleb)
-    cursor.execute("SELECT COUNT(*) FROM consolidacao_visitantes")
-    if cursor.fetchone()[0] == 0:
-        dados_visitantes = [
-            ('2026-05-23', 'Roberto Medeiros', '11999998888', 'Discipulo Thiago', 1, '2026-05-24', 'Ficou muito feliz com o contato rápido, prometeu ir na célula amanhã', 'Contatado'),
-            ('2026-05-24', 'Juliana Rezende', '11988887777', 'Líder Patrícia', 1, '2026-05-25', 'Contato feito dentro do prazo. Pediu oração pela mãe doente.', 'Contatado'),
-            ('2026-05-25', 'Lucas Nogueira', '11977776666', 'Discipulo Carlos', 0, None, 'Aguardando contato do consolidador', 'Pendente')
-        ]
-        cursor.executemany("""
-        INSERT INTO consolidacao_visitantes (data_visita, visitante_nome, visitante_whatsapp, consolidador_nome, contato_24h, data_contato, feedback, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, dados_visitantes)
-        print("Dados iniciais de consolidação de visitantes inseridos.")
-        
+    # Inserção automática de dados de teste (Seed Data) desativada para manter dados 100% reais.
     conn.commit()
     conn.close()
     print("Banco de dados SQLite inicializado com sucesso!")
