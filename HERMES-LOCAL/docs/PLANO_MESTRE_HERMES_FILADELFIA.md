@@ -188,6 +188,11 @@ IGREJA - BASE HERMES
 └── 99_ARQUIVO_BRUTO
 ```
 
+Link/ID oficial da pasta raiz:
+
+- URL: `https://drive.google.com/drive/folders/13zZhoylmC6N-t9jaMHoj7pMOB52bl7vN`
+- ID: `13zZhoylmC6N-t9jaMHoj7pMOB52bl7vN`
+
 Regra prática:
 
 - arquivos originais continuam no Google Drive;
