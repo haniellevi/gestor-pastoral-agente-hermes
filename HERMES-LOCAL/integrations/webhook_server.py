@@ -731,6 +731,7 @@ async def processar_atualizacao_cadastral(payload: dict) -> dict:
             
             updates_membros = []
             params_membros = []
+            bairro_atualizar = None
             
             telefone_atualizar = None
             
@@ -743,6 +744,8 @@ async def processar_atualizacao_cadastral(payload: dict) -> dict:
                     elif col == "data_conversao":
                         updates_membros.append("data_conversao = %s")
                         params_membros.append(normalizar_data(valor))
+                    elif col == "bairro_cidade":
+                        bairro_atualizar = str(valor).strip()
                     else:
                         updates_membros.append(f"{col} = %s")
                         params_membros.append(valor)
@@ -777,6 +780,24 @@ async def processar_atualizacao_cadastral(payload: dict) -> dict:
                     """,
                     (str(uuid.uuid4()), pessoa_uuid, telefone_atualizar)
                 )
+            if bairro_atualizar:
+                cursor.execute(
+                    """
+                    UPDATE public.enderecos
+                    SET bairro = %s,
+                        atualizado_em = NOW()
+                    WHERE pessoa_id = %s
+                    """,
+                    (bairro_atualizar, pessoa_uuid)
+                )
+                if cursor.rowcount == 0:
+                    cursor.execute(
+                        """
+                        INSERT INTO public.enderecos (id, pessoa_id, bairro)
+                        VALUES (%s, %s, %s)
+                        """,
+                        (str(uuid.uuid4()), pessoa_uuid, bairro_atualizar)
+                    )
             if updates_membros:
                 cursor.execute(f"UPDATE public.membros SET {', '.join(updates_membros)}, atualizado_em = NOW() WHERE id = %s", params_membros + [membro_id])
                 

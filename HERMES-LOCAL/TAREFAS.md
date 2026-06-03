@@ -41,24 +41,25 @@ Este arquivo serve como o painel de progresso geral do ecossistema. Ele deve ser
 - [x] Desenvolver script de migração relacional atômica de dados SQLite -> Supabase (`sqlite_to_supabase.py`).
 - [x] Adaptar o servidor de webhooks (`webhook_server.py`) e o dashboard (`app.py`) para PostgreSQL com fallback dinâmico e tradução de query placeholders (`?` para `%s`).
 
+### ☁️ Fase 2: Deploy e Operação Online 24h
+- [x] Configurar servidor VPS Hostinger com Docker Compose.
+- [x] Realizar deploy do servidor de webhooks e dashboard Hermes.
+- [x] Configurar proxy reverso Caddy / SSL para fornecer URL HTTPS pública estável para os webhooks do BotConversa.
+- [x] Propagar domínio oficial.
+- [x] Validar `https://api.filadelfiacorrente.com/health` e `https://painel.filadelfiacorrente.com` em produção.
+
 ---
 
 ## 🟡 Em Andamento
-
-### ☁️ Fase 2: Deploy e Operação Online 24h
-- [ ] Configurar servidor VPS Hostinger com Docker Compose.
-- [ ] Realizar deploy do servidor de webhooks e das tarefas recorrentes (jobs) do Hermes.
-- [ ] Configurar proxy reverso Caddy / SSL para fornecer URL HTTPS pública estável para os webhooks do BotConversa.
-- [ ] Propagar domínio oficial.
-
----
-
-## 🔴 Pendente / Planejado
 
 ### 💬 Fase 3: Integração em Produção com BotConversa
 - [ ] Substituir URL temporária do Ngrok pela URL oficial HTTPS nos blocos de integração do BotConversa.
 - [ ] Validar recebimento de webhooks a partir de interações reais no WhatsApp.
 - [ ] Ligar etiquetas (`Membro`, `Visitante`, `Consolidação 24h`) e campos personalizados reais às ações dos webhooks.
+
+---
+
+## 🔴 Pendente / Planejado
 
 ### 📅 Fase 4: Integração de Agenda (Google Calendar)
 - [ ] Implementar a sincronização incremental da tabela `compromissos` com o Google Calendar do Pastor na VPS.

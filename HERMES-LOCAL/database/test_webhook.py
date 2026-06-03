@@ -21,6 +21,9 @@ ws.DB_PATH = TEST_DB_PATH
 
 class TestWebhookIntegration(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
+        self.original_load_env = ws.load_env
+        ws.load_env = lambda: {}
+
         # 1. Cria o banco de teste a partir do original (apenas a estrutura ou cópia rápida)
         if TEST_DB_PATH.exists():
             TEST_DB_PATH.unlink()
@@ -35,7 +38,7 @@ class TestWebhookIntegration(unittest.IsolatedAsyncioTestCase):
         
         # Garante que temos um membro de teste
         cursor = self.conn.cursor()
-        cursor.execute("DELETE FROM membros WHERE telefone = '558999999999'")
+        cursor.execute("DELETE FROM membros WHERE telefone = '558999999999' OR botconversa_subscriber_id = 999999")
         cursor.execute(
             """
             INSERT INTO membros (nome_completo, telefone, botconversa_subscriber_id, status_cadastro)
@@ -46,6 +49,7 @@ class TestWebhookIntegration(unittest.IsolatedAsyncioTestCase):
         self.conn.commit()
 
     def tearDown(self):
+        ws.load_env = self.original_load_env
         self.conn.close()
         if TEST_DB_PATH.exists():
             TEST_DB_PATH.unlink()

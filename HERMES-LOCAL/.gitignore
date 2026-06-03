@@ -20,6 +20,7 @@ screenshot.png
 *.log
 startup_log.txt
 knowledge_sync.log
+senha_confirmada.txt
 
 node_modules/
 .next/

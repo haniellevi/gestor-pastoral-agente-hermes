@@ -44,6 +44,7 @@ Preencha:
 
 ```text
 SUPABASE_URL=https://bymrxgwjkbbqfzuuvhyk.supabase.co
+SUPABASE_DB_URL=postgresql://postgres.bymrxgwjkbbqfzuuvhyk:SENHA_DO_BANCO@aws-1-sa-east-1.pooler.supabase.com:6543/postgres
 SUPABASE_SERVICE_ROLE_KEY=...
 BOTCONVERSA_API_KEY=...
 BOTCONVERSA_BASE_URL=https://backend.botconversa.com.br/api/v1/webhook
