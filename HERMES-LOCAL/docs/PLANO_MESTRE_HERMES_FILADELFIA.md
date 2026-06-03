@@ -809,7 +809,48 @@ arquivado
 erro
 ```
 
-### 13.8 Regra de segurança
+### 13.8 Como criar o client_secret do Google
+
+Objetivo: gerar um OAuth Client do tipo Desktop App para que o Hermes possa pedir autorização da conta Google do Pastor e acessar Drive, Calendar, Docs, Sheets, Gmail e contatos conforme os escopos configurados em `integrations/google_auth.py`.
+
+Passo a passo:
+
+1. Acesse o Google Cloud Console:
+   `https://console.cloud.google.com`
+2. Crie ou selecione um projeto. Nome sugerido:
+   `Hermes Filadelfia`
+3. Ative as APIs necessárias em `APIs e serviços > Biblioteca`:
+   - Google Drive API;
+   - Google Calendar API;
+   - Google Docs API;
+   - Google Sheets API;
+   - Gmail API;
+   - People API.
+4. Configure a tela de consentimento em `Google Auth Platform > Branding`.
+   - App name: `Hermes Filadelfia`
+   - User support email: e-mail do Pastor ou da igreja.
+   - Audience: usar `External` se for conta Gmail comum; usar `Internal` somente se a igreja tiver Google Workspace.
+   - Contact email: e-mail do Pastor ou responsável técnico.
+5. Se estiver em modo de teste, adicione o e-mail Google do Pastor em `Audience > Test users`.
+6. Crie o cliente OAuth em `Google Auth Platform > Clients`.
+   - Clique em `Create Client`.
+   - Application type: `Desktop app`.
+   - Name: `Hermes Local Desktop`.
+   - Clique em `Create`.
+7. Faça download do JSON.
+8. Salve o arquivo como `client_secret_hermes_filadelfia.json` na pasta `Downloads` do Windows ou em `HERMES-LOCAL/integrations/`.
+9. Nunca subir esse arquivo para o GitHub. Ele já está protegido pelo `.gitignore`.
+10. Rode no desktop:
+
+```powershell
+python integrations/google_auth.py --secrets "C:\CAMINHO\PARA\client_secret_hermes_filadelfia.json"
+```
+
+O comando abrirá o navegador, pedirá login no Google e criará `integrations/token.json`. Esse token também não deve ir para o GitHub.
+
+Observação: em produção, o ideal futuro é revisar escopos e reduzir permissões ao mínimo necessário para cada rotina.
+
+### 13.9 Regra de segurança
 
 Arquivo financeiro, aconselhamento ou lista de membros nunca deve virar resposta pública automática.
 
