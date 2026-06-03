@@ -1,0 +1,42 @@
+services:
+  hermes-api:
+    build:
+      context: .
+    container_name: hermes-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./database:/app/database
+      - ./config:/app/config
+    command:
+      - sh
+      - -c
+      - "python database/initialize_db.py && python database/migrate_pastoral_system.py && uvicorn integrations.webhook_server:app --host 0.0.0.0 --port 5050"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:5050/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  hermes-dashboard:
+    build:
+      context: .
+    container_name: hermes-dashboard
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./database:/app/database
+      - ./config:/app/config
+    command:
+      - sh
+      - -c
+      - "python database/initialize_db.py && python database/migrate_pastoral_system.py && streamlit run dashboard/app.py --server.address=0.0.0.0 --server.port=8501"
+    depends_on:
+      hermes-api:
+        condition: service_healthy
