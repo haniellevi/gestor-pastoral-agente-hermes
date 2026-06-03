@@ -103,7 +103,7 @@ def list_children(service, folder_id: str) -> list[dict[str, Any]]:
 
 
 def upsert_source(
-    client: SupabaseRestClient,
+    client: SupabaseRestClient | None,
     folder: dict[str, Any],
     area: str,
     dry_run: bool,
@@ -117,12 +117,14 @@ def upsert_source(
     if dry_run:
         print(f"[dry-run] fonte: {payload}")
         return None
+    if client is None:
+        raise RuntimeError("Cliente Supabase indisponivel fora do modo dry-run.")
     rows = client.upsert("drive_sources", payload, on_conflict="drive_folder_id")
     return str(rows[0]["id"]) if rows else None
 
 
 def upsert_drive_file(
-    client: SupabaseRestClient,
+    client: SupabaseRestClient | None,
     file_item: dict[str, Any],
     source_id: str | None,
     dry_run: bool,
@@ -140,11 +142,13 @@ def upsert_drive_file(
     if dry_run:
         print(f"[dry-run] arquivo: {payload}")
         return
+    if client is None:
+        raise RuntimeError("Cliente Supabase indisponivel fora do modo dry-run.")
     client.upsert("drive_files", payload, on_conflict="drive_file_id")
 
 
 def register_log(
-    client: SupabaseRestClient,
+    client: SupabaseRestClient | None,
     status: str,
     stats: SyncStats,
     details: str | None = None,
@@ -200,7 +204,7 @@ def run_once(dry_run: bool = False) -> SyncStats:
     root_name = _env("HERMES_DRIVE_ROOT_NAME", DEFAULT_ROOT_NAME)
 
     service = build_drive_service()
-    client = SupabaseRestClient()
+    client = None if dry_run else SupabaseRestClient()
 
     if not root_id:
         root_id = find_root_folder_id(service, root_name)

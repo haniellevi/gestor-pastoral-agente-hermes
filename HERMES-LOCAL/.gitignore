@@ -5,6 +5,8 @@
 config/integrations.env
 integrations/token.json
 integrations/client_secret*.json
+**/client_secret*.json
+**/credentials*.json
 
 __pycache__/
 *.py[cod]
@@ -20,4 +22,3 @@ node_modules/
 .next/
 dist/
 build/
-

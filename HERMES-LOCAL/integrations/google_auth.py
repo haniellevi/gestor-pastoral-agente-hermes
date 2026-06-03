@@ -102,8 +102,8 @@ if __name__ == '__main__':
     
     try:
         get_credentials(args.secrets)
-        print("✅ Autenticação com o Google está configurada e pronta para uso!")
+        print("Autenticacao com o Google esta configurada e pronta para uso!")
         sys.exit(0)
     except Exception as e:
-        print(f"❌ Erro na autenticação: {e}", file=sys.stderr)
+        print(f"Erro na autenticacao: {e}", file=sys.stderr)
         sys.exit(1)
