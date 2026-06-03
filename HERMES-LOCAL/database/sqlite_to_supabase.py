@@ -569,7 +569,7 @@ def migrate_all():
         # ---- 11. ATENDIMENTOS RUTE (atendimentos_rute) ----
         print("\n[Bônus] Migrando atendimentos_rute...")
         sqlite_cur.execute("""
-            SELECT id, pessoa_name, telefone, tipo_solicitacao, origem, nivel_urgencia, status,
+            SELECT id, pessoa_nome, telefone, tipo_solicitacao, origem, nivel_urgencia, status,
                    responsavel, resumo, membro_id, botconversa_subscriber_id, criado_em, atualizado_em
             FROM atendimentos_rute
         """)
@@ -594,7 +594,7 @@ def migrate_all():
                 """,
                 (
                     at["id"],
-                    at["pessoa_name"],
+                    at["pessoa_nome"],
                     normalizar_telefone(at["telefone"]) or None,
                     at["tipo_solicitacao"],
                     at["origem"],
