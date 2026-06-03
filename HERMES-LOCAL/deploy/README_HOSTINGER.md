@@ -21,13 +21,13 @@ O objetivo é validar webhooks e painel. Depois entraremos com domínio, HTTPS e
 No terminal da VPS, rode:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/haniellevi/gestor-pastoral-agente-hermes/feature/instalacao-hermes/deploy/hostinger_bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/haniellevi/gestor-pastoral-agente-hermes/feature/instalacao-hermes/HERMES-LOCAL/deploy/hostinger_bootstrap.sh | bash
 ```
 
 Na primeira execução, o script vai:
 
 - instalar Docker;
-- clonar o repositório em `/opt/hermes-filadelfia`;
+- clonar o repositório em `/opt/gestor-pastoral-agente-hermes`;
 - criar `.env` a partir de `.env.example`;
 - parar antes de subir containers, para você preencher segredos.
 
@@ -36,7 +36,7 @@ Na primeira execução, o script vai:
 Depois da primeira execução:
 
 ```bash
-cd /opt/hermes-filadelfia
+cd /opt/gestor-pastoral-agente-hermes/HERMES-LOCAL
 nano .env
 ```
 
@@ -56,7 +56,7 @@ Não coloque `SUPABASE_SERVICE_ROLE_KEY` em GitHub, site público ou BotConversa
 Depois de salvar `.env`:
 
 ```bash
-cd /opt/hermes-filadelfia
+cd /opt/gestor-pastoral-agente-hermes/HERMES-LOCAL
 docker compose up -d --build
 docker compose ps
 ```
@@ -82,4 +82,3 @@ Depois que estiver respondendo:
 - colocar Caddy/Nginx com HTTPS;
 - apontar BotConversa para URL HTTPS;
 - ativar worker recorrente para Google Drive e Calendar.
-

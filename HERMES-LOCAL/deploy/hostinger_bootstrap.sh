@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT_DIR="/opt/hermes-filadelfia"
+PROJECT_ROOT="/opt/gestor-pastoral-agente-hermes"
+APP_DIR="$PROJECT_ROOT/HERMES-LOCAL"
 REPO_URL="${REPO_URL:-https://github.com/haniellevi/gestor-pastoral-agente-hermes.git}"
 BRANCH="${BRANCH:-feature/instalacao-hermes}"
 
@@ -20,22 +21,23 @@ if ! command -v docker >/dev/null 2>&1; then
   apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 fi
 
-mkdir -p "$PROJECT_DIR"
+mkdir -p "$PROJECT_ROOT"
 
-if [ ! -d "$PROJECT_DIR/.git" ]; then
-  git clone --branch "$BRANCH" "$REPO_URL" "$PROJECT_DIR"
+if [ ! -d "$PROJECT_ROOT/.git" ]; then
+  rm -rf "$PROJECT_ROOT"
+  git clone --branch "$BRANCH" "$REPO_URL" "$PROJECT_ROOT"
 else
-  git -C "$PROJECT_DIR" fetch origin "$BRANCH"
-  git -C "$PROJECT_DIR" checkout "$BRANCH"
-  git -C "$PROJECT_DIR" pull --ff-only origin "$BRANCH"
+  git -C "$PROJECT_ROOT" fetch origin "$BRANCH"
+  git -C "$PROJECT_ROOT" checkout "$BRANCH"
+  git -C "$PROJECT_ROOT" pull --ff-only origin "$BRANCH"
 fi
 
-cd "$PROJECT_DIR"
+cd "$APP_DIR"
 
 if [ ! -f .env ]; then
   cp .env.example .env
   chmod 600 .env
-  echo "Arquivo .env criado em $PROJECT_DIR/.env"
+  echo "Arquivo .env criado em $APP_DIR/.env"
   echo "Edite esse arquivo com SUPABASE_SERVICE_ROLE_KEY e BOTCONVERSA_API_KEY antes de subir os containers."
   exit 0
 fi
@@ -49,4 +51,3 @@ ufw allow 8501/tcp || true
 ufw --force enable || true
 
 docker compose ps
-
