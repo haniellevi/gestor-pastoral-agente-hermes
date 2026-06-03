@@ -102,6 +102,27 @@ class SupabaseRestClient:
         result = self._request("POST", f"/{encoded_table}", payload)
         return result if isinstance(result, list) else []
 
+    def upsert(
+        self,
+        table: str,
+        payload: dict[str, Any],
+        on_conflict: str,
+    ) -> list[dict[str, Any]]:
+        encoded_table = urllib.parse.quote(table, safe="")
+        encoded_conflict = urllib.parse.quote(on_conflict, safe=",")
+        result = self._request(
+            "POST",
+            f"/{encoded_table}?on_conflict={encoded_conflict}",
+            payload,
+            prefer="resolution=merge-duplicates,return=representation",
+        )
+        return result if isinstance(result, list) else []
+
+    def select(self, table: str, query: str = "select=*") -> list[dict[str, Any]]:
+        encoded_table = urllib.parse.quote(table, safe="")
+        result = self._request("GET", f"/{encoded_table}?{query}", prefer=None)
+        return result if isinstance(result, list) else []
+
     def patch_by_id(self, table: str, row_id: str, payload: dict[str, Any]) -> list[dict[str, Any]]:
         encoded_table = urllib.parse.quote(table, safe="")
         encoded_id = urllib.parse.quote(row_id, safe="")

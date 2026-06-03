@@ -58,6 +58,25 @@ services:
       hermes-api:
         condition: service_healthy
 
+  hermes-drive-sync:
+    build:
+      context: .
+    container_name: hermes-drive-sync
+    restart: unless-stopped
+    profiles:
+      - drive-sync
+    env_file:
+      - .env
+    volumes:
+      - ./config:/app/config
+      - ./integrations:/app/integrations
+    command:
+      - python
+      - integrations/google_drive_sync.py
+      - --loop
+      - --interval-minutes
+      - "15"
+
 volumes:
   caddy_data:
   caddy_config:

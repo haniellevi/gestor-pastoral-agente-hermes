@@ -169,6 +169,45 @@ Agente pode executar rotinas de baixo risco.
 Agente precisa de aprovação para decisões sensíveis.
 ```
 
+### 4.6 Google Drive como acervo monitorado
+
+A estrutura criada no Drive deve ser tratada como acervo bruto e operacional, não como banco principal.
+
+Pasta raiz:
+
+```text
+IGREJA - BASE HERMES
+├── 00_INBOX_HERMES
+├── 01_CONHECIMENTO_OFICIAL
+├── 02_AGENDA_EVENTOS
+├── 03_CELULAS_G12
+├── 04_FINANCEIRO
+├── 05_SERMOES_ESTUDOS
+├── 06_MARKETING_COMUNICACAO
+├── 07_ADMINISTRATIVO
+└── 99_ARQUIVO_BRUTO
+```
+
+Regra prática:
+
+- arquivos originais continuam no Google Drive;
+- o Supabase guarda o índice, metadados, status, links, resumo e conhecimento aprovado;
+- o Hermes não deve assumir que um arquivo bruto é verdade oficial até ser classificado e aprovado;
+- `01_CONHECIMENTO_OFICIAL` tem prioridade maior para alimentar respostas dos agentes;
+- `00_INBOX_HERMES` é uma caixa de entrada para itens ainda não triados;
+- `99_ARQUIVO_BRUTO` serve para histórico, backup documental e materiais antigos.
+
+Implementação inicial:
+
+```text
+Google Drive
+    -> integrations/google_drive_sync.py
+    -> Supabase drive_sources / drive_files
+    -> tarefas futuras de extração e aprovação de conhecimento
+```
+
+Nesta fase, a atualização constante será por tarefa recorrente a cada 15 minutos na VPS. Depois que o domínio HTTPS estiver propagado e estável, podemos adicionar webhook oficial do Google Drive. Pela documentação oficial do Google Drive API, notificações push exigem uma URL HTTPS de callback e os canais de notificação têm expiração, então precisam ser renovados periodicamente.
+
 ---
 
 ## 5. Arquitetura alvo
