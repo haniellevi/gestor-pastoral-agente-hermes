@@ -1,4 +1,21 @@
 services:
+  caddy:
+    image: caddy:2.9
+    container_name: hermes-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      hermes-api:
+        condition: service_healthy
+      hermes-dashboard:
+        condition: service_started
+
   hermes-api:
     build:
       context: .
@@ -40,3 +57,7 @@ services:
     depends_on:
       hermes-api:
         condition: service_healthy
+
+volumes:
+  caddy_data:
+  caddy_config:

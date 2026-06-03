@@ -1,0 +1,12 @@
+api.filadelfiacorrente.com {
+    reverse_proxy hermes-api:5050
+}
+
+painel.filadelfiacorrente.com {
+    reverse_proxy hermes-dashboard:8501
+}
+
+filadelfiacorrente.com, www.filadelfiacorrente.com {
+    respond "Igreja Batista Filadelfia Internacional de Corrente - sistema em implantacao." 200
+}
+
