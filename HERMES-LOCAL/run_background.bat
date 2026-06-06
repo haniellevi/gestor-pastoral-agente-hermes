@@ -7,8 +7,8 @@ set HERMES_EXE=%VENV_PATH%\Scripts\hermes.exe
 
 cd /d "c:\Users\hanie\OneDrive\Documentos\WORKSPACE\Projetos Locais\Gestao Pastoral - Pr Raniel Levi\HERMES-LOCAL"
 
-:: Streamlit Dashboard - janela minimizada e independente
-start "" /MIN "%PYTHON_EXE%" -m streamlit run dashboard/app.py --browser.gatherUsageStats false
+:: Streamlit Dashboard Hermes 2.0 - janela minimizada e independente
+start "" /MIN "%PYTHON_EXE%" -m streamlit run dashboard/app_v2.py --browser.gatherUsageStats false
 
 :: Aguarda 3s para evitar conflito de porta
 timeout /t 3 /nobreak >nul

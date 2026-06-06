@@ -1,6 +1,6 @@
 # Assistente - Atualizacao Cadastral Inteligente
 
-Este documento define o assistente de IA para o fluxo `2A - Confirmacao Cadastral Semestral`.
+Este documento define o assistente de IA para os fluxos `Atualização Cadastral` e `2A - Recadastro Anual`.
 
 Objetivo:
 
@@ -67,7 +67,7 @@ Acoes:
 - Aplicar `Atualização Cadastral`.
 - Remover `Atualização Pendente`.
 - Atualizar `Ultima_Atualiz_Cadas` com a data atual.
-- Inscrever em `SEQ - Revisao Cadastral 6M`.
+- Inscrever em `SEQ - Recadastro Anual`.
 - Encerrar.
 
 Mensagem:
@@ -294,8 +294,7 @@ Obrigatorio:
 
 Desejavel:
 
-- `Proxima_Atualizacao_Cadastral` como data.
-- `Proximo_Recadastro_Anual` como data.
+- `Prox_Recadastro` como data.
 
 ## Webhook Hermes recomendado
 
@@ -323,4 +322,4 @@ O Hermes deve:
 5. Aplicar `Cadastro Completo` se os obrigatorios estiverem preenchidos.
 6. Aplicar `Atualização Cadastral`.
 7. Remover `Atualização Pendente`.
-8. Inscrever em sequencias 6M e anual.
+8. Inscrever somente em `SEQ - Recadastro Anual`.

@@ -53,7 +53,7 @@ services:
     command:
       - sh
       - -c
-      - "python database/initialize_db.py && python database/migrate_pastoral_system.py && streamlit run dashboard/app.py --server.address=0.0.0.0 --server.port=8501"
+      - "python database/initialize_db.py && python database/migrate_pastoral_system.py && streamlit run dashboard/app_v2.py --server.address=0.0.0.0 --server.port=8501"
     depends_on:
       hermes-api:
         condition: service_healthy

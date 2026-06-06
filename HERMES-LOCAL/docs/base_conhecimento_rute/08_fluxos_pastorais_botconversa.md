@@ -4,6 +4,26 @@
 
 Objetivo: recepcionar a pessoa, identificar se esta cadastrada e encaminhar corretamente.
 
+Configuracao no BotConversa:
+
+- selecionar `Boas Vindas Filadelfia` em `Configurações > Fluxos Padrões > Fluxo de boas vindas`;
+- selecionar `Mensagem Padrão - IA RUTE` em `Configurações > Fluxos Padrões > Fluxo de resposta padrão`;
+- selecionar `Midia Recebida - Rute` em `Configurações > Fluxos Padrões > Fluxo padrão para mídia`;
+- selecionar `Pos-Atendimento - Feedback` em `Configurações > Fluxos Padrões > Fluxo Pós-Atendimento`.
+
+### Origens de entrada
+
+Pessoas podem chegar ao sistema por:
+
+- redes sociais;
+- site;
+- campanhas;
+- grupo da igreja;
+- internet;
+- cadastro feito por alguma celula.
+
+Quando a origem for conhecida, salvar em `Origem_Entrada`.
+
 ### Mensagem inicial
 
 ```text
@@ -15,7 +35,7 @@ Graça e Paz! Seja bem-vindo(a) a Igreja Batista Filadelfia Internacional de Cor
 1. Aplicar etiqueta `Filadelfia Corrente`.
 2. Verificar etiquetas:
    - Se tem `Cadastro Completo` e `Atualização Cadastral`: enviar para Rute geral.
-   - Se tem `Cadastro Completo`, mas nao tem `Atualização Cadastral`: enviar para confirmacao cadastral semestral.
+   - Se tem `Cadastro Completo`, mas o recadastro anual esta pendente: enviar para `Recadastro Anual`.
    - Se nao tem `Cadastro Completo`: perguntar se e membro, visitante ou outro vinculo.
 
 ### Opcoes
@@ -55,11 +75,11 @@ Encerramento:
 - Remover `Atualização Pendente`.
 - Definir `Status_Cadastro = Completo`.
 - Definir `Ultima_Atualiz_Cadas = data atual`.
-- Inscrever em revisao cadastral futura.
+- Inscrever em `SEQ - Recadastro Anual`.
 
-## Fluxo 2A - Confirmacao Cadastral Semestral
+## Fluxo 2A - Recadastro Anual
 
-Objetivo: verificar se os dados continuam iguais ou se algo mudou.
+Objetivo: verificar uma vez por ano se os dados continuam iguais ou se algo mudou.
 
 Mensagem padronizada:
 
@@ -91,7 +111,7 @@ Se `Tudo igual`:
 - aplicar `Atualização Cadastral`;
 - remover `Atualização Pendente`;
 - atualizar `Ultima_Atualiz_Cadas`;
-- reinscrever em revisao futura.
+- reinscrever em `SEQ - Recadastro Anual`.
 
 Se `Atualizar algo`:
 
@@ -100,7 +120,7 @@ Se `Atualizar algo`:
 - salvar campos personalizados especificos quando configurados;
 - enviar webhook para Hermes quando necessario.
 
-## Fluxo 3 - Visitante / Consolidacao
+## Fluxo 3 - Visitante / Acompanhamento 24h
 
 Objetivo: acolher visitante e garantir contato em ate 24h.
 
@@ -111,19 +131,25 @@ Campos:
 - Bairro/cidade
 - Como conheceu a igreja
 - Interesse
-- Deseja contato da lideranca?
+- Deseja que alguem da igreja acompanhe e ajude nos proximos passos?
 
 Acoes:
 
 - Aplicar `Visitante`.
 - Aplicar `Consolidação 24h`.
-- Notificar Luciane/consolidacao.
-- Encaminhar para Caleb quando envolver celula/consolidacao.
+- Notificar Luciane/equipe interna de acompanhamento.
+- Encaminhar para Caleb quando envolver celula ou acompanhamento.
+
+Linguagem:
+
+- nao usar "consolidador" com o visitante;
+- dizer "alguem da nossa igreja", "uma pessoa da nossa equipe", "um amigo proximo" ou "alguem para te acompanhar";
+- manter `Consolidação 24h` apenas como etiqueta interna.
 
 Mensagem:
 
 ```text
-Graça e Paz! Ficamos felizes com sua visita. Queremos cuidar bem de voce e te conhecer melhor.
+Graça e Paz! Ficamos felizes com sua visita. Queremos cuidar bem de voce e, se desejar, alguem da nossa igreja pode te acompanhar nos proximos passos.
 ```
 
 ## Fluxo 4 - Pedido de Oracao
@@ -205,6 +231,70 @@ Acoes:
 - Se visitante: aplicar `Consolidação 24h`.
 - Encaminhar para Caleb/central de celulas.
 
+## Fluxo 7A - Relatorio de Celula pelo Lider
+
+Objetivo: 1 hora depois da celula, conversar com o lider para coletar o relatorio e atualizar o sistema.
+
+Entrada:
+
+- job do Hermes baseado no cadastro da celula;
+- lider inicia manualmente pelo BotConversa;
+- lembrete de pendencia de relatorio.
+
+Campos:
+
+- data da celula;
+- nome da celula;
+- lider;
+- presenca de membros;
+- visitantes;
+- decisoes de fe;
+- novos nomes;
+- observacoes.
+
+Acoes:
+
+- ativar `Caleb Relatorios Celula`;
+- salvar resumo estruturado;
+- enviar webhook `/webhook_relatorio_celula`;
+- atualizar dashboard.
+
+Regra de recuperacao:
+
+- se uma celula ficar 3 semanas sem relatorio, informar ao Pastor;
+- enviar lembrete respeitoso ao lider.
+
+## Fluxo 7B - Agenda G12
+
+Objetivo: enviar a agenda do mes e das respectivas semanas para todos os G12.
+
+Acoes:
+
+- usar calendario aprovado;
+- segmentar por etiquetas G12;
+- enviar mensagem mensal;
+- enviar mensagem semanal;
+- nao inventar datas.
+
+## Fluxo 7C - Notificacoes de Cultos e Sermoes
+
+Objetivo: enviar resumo do sermão publicado no Spotify para pessoas que aceitaram receber notificacoes dos cultos.
+
+Entrada:
+
+- link do Spotify;
+- imagem do sermão;
+- tema/titulo;
+- observacoes ou transcricao quando houver.
+
+Acoes:
+
+- ativar `Barnabe Sermoes`;
+- gerar resumo em 1 paragrafo;
+- preparar mensagem com imagem + resumo + link;
+- enviar apenas para contatos com opt-in de notificacoes dos cultos;
+- se faltar informacao, pedir revisao humana.
+
 ## Fluxo 8 - Encerrar Conversa
 
 Mensagem:
@@ -221,7 +311,6 @@ Se atendimento foi por IA:
 ## Sequencias recomendadas
 
 - `SEQ - Retomar Atualizacao Cadastral`
-- `SEQ - Revisao Cadastral 6M`
 - `SEQ - Recadastro Anual`
 - `SEQ - Follow-up Visitante 24h`
 - `SEQ - Pedido de Oracao Follow-up`
@@ -235,4 +324,3 @@ Usar Hermes quando precisar:
 - cruzar dados com SQLite, Google Sheets, Notion ou dashboard;
 - verificar contatos fora de sequencia;
 - rodar rotina mensal.
-

@@ -187,6 +187,25 @@ class BotConversaClient:
         data = self._delete(f"/subscriber/{subscriber_id}/campaigns/{campaign_id}/")
         return data if isinstance(data, dict) else {}
 
+    def send_media(self, subscriber_id: int, media_type: str, media_value: str, caption: str = "") -> dict:
+        """
+        Envia mídia (imagem, áudio, vídeo, arquivo) para um subscriber.
+
+        Args:
+            subscriber_id: ID do contato no BotConversa
+            media_type: 'image', 'audio', 'video', 'file', 'document'
+            media_value: URL pública ou path para o arquivo de mídia
+            caption: legenda opcional (texto que acompanha a mídia)
+        """
+        payload = {"type": media_type, "value": media_value}
+        if caption:
+            payload["caption"] = caption
+        data = self._post(
+            f"/subscriber/{subscriber_id}/send_message/",
+            payload,
+        )
+        return data if isinstance(data, dict) else {}
+
     def change_conversation_status(
         self,
         subscriber_id: int,

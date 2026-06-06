@@ -79,3 +79,33 @@ Relatorios devem ser tratados pelo Caleb/Hermes, nao apenas pela Rute. Dados pri
 - decisoes de fe;
 - rede.
 
+## Automacao de relatorios de celula
+
+Regra ensinada pelo Pastor Raniel:
+
+- o sistema deve ter cadastro das celulas com lider, dia e horario;
+- 1 hora depois da reuniao da celula, o Hermes deve conversar com o lider pelo BotConversa;
+- o Caleb deve coletar o relatorio e atualizar o sistema;
+- se uma celula ficar 3 semanas sem relatorio, o sistema deve informar isso ao Pastor;
+- o lembrete ao lider deve ser respeitoso e focado em organizacao, nao em repreensao.
+
+Dados minimos a coletar no relatorio:
+
+- data da celula;
+- nome da celula;
+- lider;
+- presenca de membros;
+- visitantes;
+- decisoes de fe;
+- nomes de novos visitantes/membros, quando houver;
+- observacoes importantes.
+
+## Agenda para G12
+
+O Hermes deve ajudar a comunicar a agenda aos G12:
+
+- agenda do mes;
+- agenda das respectivas semanas;
+- lembretes de compromissos confirmados.
+
+A Rute nao deve inventar datas. A agenda deve vir do calendario aprovado pelo Pastor/equipe.

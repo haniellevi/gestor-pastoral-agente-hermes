@@ -51,7 +51,7 @@ POST /webhook_atualizacao_cadastral
 Uso:
 
 - atualizacao cadastral completa;
-- confirmacao cadastral semestral;
+- recadastro anual;
 - recadastro anual;
 - qualquer fluxo que gere bloco `[ATUALIZACAO_CADASTRAL]`.
 
@@ -128,11 +128,10 @@ Crie ou padronize estas etiquetas no BotConversa.
 | `Outro-Vinculo` | contato que nao e membro nem visitante claro |
 | `Cadastro Completo` | dados minimos preenchidos |
 | `Cadastro Incompleto` | faltam dados obrigatorios |
-| `Atualização Cadastral` | confirmacao do ciclo vigente concluida |
-| `Atualização Pendente` | precisa atualizar neste ciclo |
+| `Atualização Cadastral` | cadastro inicial ou recadastro vigente concluido |
+| `Atualização Pendente` | cadastro inicial ou recadastro anual pendente |
 | `Atualização Recusada` | pessoa recusou ou adiou explicitamente |
 | `Atualização Confirmada Sem Alteração` | confirmou que nada mudou |
-| `Atualização 6M Agendada` | controle de revisao semestral |
 | `Recadastro Anual Agendado` | controle de recadastro anual |
 | `Consolidação 24h` | visitante precisa de contato rapido |
 | `Pedido de Oração` | pedido registrado para intercessao |
@@ -165,8 +164,7 @@ Crie ou padronize estas etiquetas no BotConversa.
 | `Feedback_falta` | texto | o que sente falta |
 | `Data_Conversao` | texto/data | data de conversao, se informada |
 | `Ultima_Atualiz_Cadas` | data/texto | ultima atualizacao cadastral |
-| `Proxima_Atualizacao_Cadastral` | data/texto | proxima revisao 6M |
-| `Proximo_Recadastro_Anual` | data/texto | proximo recadastro anual |
+| `Prox_Recadastro` | data/texto | proximo recadastro anual |
 | `Status_Cadastro` | texto | Completo / Incompleto / Atualizar / Recusou |
 | `Tipo_Vinculo` | texto | Membro / Visitante / Lider / Outro |
 | `Resumo_Atend_IA` | texto | resumo da IA |
@@ -175,7 +173,7 @@ Crie ou padronize estas etiquetas no BotConversa.
 | `Nivel_Urgencia` | texto | Baixa / Media / Alta / Crise |
 | `Pedido_Oracao` | texto | criar se quiser separar pedido de oracao do resumo geral |
 | `Resumo_Aconselhamento` | texto | criar para triagem pastoral |
-| `Consolidador_Responsavel` | texto | visitante/consolidacao |
+| `Consolidador_Responsavel` | texto | responsavel interno pelo acompanhamento do visitante |
 | `Status_Consolidacao` | texto | Pendente / Contatado / Integrado / Desistiu |
 | `Como_Conheceu_Igreja` | texto | origem do visitante |
 | `Disponibilidade_Celula` | texto | melhor dia/horario para celula |
@@ -185,7 +183,6 @@ Crie ou padronize estas etiquetas no BotConversa.
 | Sequencia | Objetivo | Quando inscrever | Quando remover |
 |---|---|---|---|
 | `SEQ - Retomar Atualizacao Cadastral` | lembrar quem abandonou ou adiou cadastro | quando clicar `Agora nao` ou abandonar fluxo | quando concluir cadastro |
-| `SEQ - Revisao Cadastral 6M` | chamar revisao semestral | apos cadastro/confirmacao concluida | ao iniciar nova revisao, se necessario |
 | `SEQ - Recadastro Anual` | chamar recadastro anual | apos cadastro completo | ao iniciar recadastro |
 | `SEQ - Follow-up Visitante 24h` | garantir consolidacao | visitante registrado | quando status for integrado/desistiu |
 | `SEQ - Pedido de Oracao Follow-up` | cuidado apos oracao | pedido registrado sem crise | ao concluir acompanhamento |
@@ -208,7 +205,7 @@ Campos:
 
 | Valor | Destino |
 |---|---|
-| `Atualizacao_Cadastral` | `Fluxo 2A - Confirmacao Cadastral Semestral` ou `Atualização Cadastral` |
+| `Atualizacao_Cadastral` | `Atualização Cadastral` ou `Recadastro Anual` |
 | `Visitante` | `VISITANTE` |
 | `Pedido_Oracao` | `Pedido de Oração` |
 | `Aconselhamento` | `Pedido de Aconselhamento` / atendimento humano |
@@ -379,8 +376,8 @@ Como posso te ajudar hoje?
 1. Tem `Cadastro Completo` e tem `Atualização Cadastral`:
    - enviar para `Mensagem Padrão - IA RUTE`.
 
-2. Tem `Cadastro Completo`, mas nao tem `Atualização Cadastral`:
-   - enviar para `Fluxo 2A - Confirmacao Cadastral Semestral`.
+2. Tem `Cadastro Completo`, mas o recadastro anual esta pendente:
+   - enviar para `Recadastro Anual`.
 
 3. Nao tem `Cadastro Completo`:
    - perguntar vinculo:
@@ -394,9 +391,35 @@ Como posso te ajudar hoje?
 | Resposta | Acoes |
 |---|---|
 | `Sou membro` | aplicar `Membro`, `Cadastro Incompleto`, `Atualização Pendente`; iniciar `Atualização Cadastral` |
-| `Sou visitante` | aplicar `Visitante`, `Consolidação 24h`; iniciar `VISITANTE` |
-| `Quero conhecer` | aplicar `Visitante`; enviar endereco/cultos; oferecer consolidacao |
+| `Sou visitante` | aplicar `Visitante`; salvar `Tipo_Vinculo = Visitante`; abrir menu `Permitir Acompanhamento Visitante` |
+| `Quero conhecer` | aplicar `Visitante`; salvar `Tipo_Vinculo = Visitante`; abrir menu `Permitir Acompanhamento Visitante` |
 | `Outro vínculo` | aplicar `Outro-Vinculo`; enviar para Rute geral ou humano |
+
+### Menu `Permitir Acompanhamento Visitante`
+
+Mensagem:
+
+```text
+*Que alegria receber voce!* 😊
+
+Queremos te acolher com carinho.
+
+Posso pedir para *alguem da nossa igreja* falar com voce com calma e te ajudar nos proximos passos?
+```
+
+| Saida | Acoes | Destino |
+|---|---|---|
+| `Sim, pode` | aplicar `Consolidação 24h`; salvar `Aceita_Acompanhamento = Sim` se o campo existir | iniciar `VISITANTE / Acompanhamento 24h` |
+| `Agora nao` | salvar `Aceita_Acompanhamento = Nao` se o campo existir | mensagem curta de acolhimento -> `Encerrar Conversa` |
+| `Quero saber mais` | manter `Visitante`; salvar `Ultima_Intencao = Visitante` | bloco de informacoes basicas -> `1- RUTE SECRETARIA` |
+| entrada invalida / limite de erro | nao aplicar nova etiqueta | repetir menu; depois de 3 erros -> `1- RUTE SECRETARIA` |
+| inatividade | manter `Visitante` | lembrete curto -> `Encerrar Conversa` |
+
+Regra de planejamento:
+
+```text
+Nao existe ponta solta: todo botao, erro, limite de erro e inatividade termina em outro fluxo, humano ou Encerrar Conversa.
+```
 
 ### Webhook
 
@@ -490,7 +513,6 @@ Botoes:
 - Remover `Atualização Recusada`.
 - Definir `Status_Cadastro = Completo`.
 - Definir `Ultima_Atualiz_Cadas = data atual`.
-- Inscrever em `SEQ - Revisao Cadastral 6M`.
 - Inscrever em `SEQ - Recadastro Anual`.
 - Chamar webhook cadastral.
 
@@ -539,16 +561,16 @@ Conferir:
 - manter `integrations/webhook_server.py` rodando;
 - expor com ngrok ou outro tunel.
 
-## 10. Fluxo 2A - Confirmacao Cadastral Semestral
+## 10. Fluxo 2A - Recadastro Anual
 
 ### Objetivo
 
-Perguntar se os dados continuam iguais e permitir atualizacao por texto/audio.
+Uma vez por ano, perguntar se os dados continuam iguais e permitir atualizacao por texto/audio.
 
 ### Entrada
 
 - contato tem `Cadastro Completo`;
-- contato nao tem `Atualização Cadastral` do ciclo atual;
+- contato esta com recadastro anual pendente;
 - ou contato tem `Atualização Pendente`.
 
 ### Mensagem inicial
@@ -586,7 +608,6 @@ Acoes:
 - remover `Atualização Recusada`;
 - definir `Status_Cadastro = Completo`;
 - definir `Ultima_Atualiz_Cadas = data atual`;
-- inscrever em `SEQ - Revisao Cadastral 6M`;
 - inscrever em `SEQ - Recadastro Anual`;
 - chamar webhook cadastral com `status=sem_alteracao`.
 
@@ -722,7 +743,7 @@ Futuro:
 
 ### Objetivo
 
-Receber visitante e garantir contato de consolidacao em ate 24h.
+Receber visitante e garantir acompanhamento humano em ate 24h.
 
 ### Entrada
 
@@ -755,7 +776,7 @@ Queremos cuidar bem de voce e te conhecer melhor.
 - definir `Tipo_Vinculo = Visitante`;
 - definir `Ultima_Intencao = Visitante`;
 - inscrever em `SEQ - Follow-up Visitante 24h`;
-- notificar/encaminhar para Luciane ou equipe de consolidacao.
+- notificar/encaminhar para Luciane ou equipe interna de acompanhamento.
 
 ### Webhook
 
@@ -804,7 +825,7 @@ Colunas atuais:
 - `data_visita`
 - `visitante_nome`
 - `visitante_whatsapp`
-- `consolidador_nome`
+- `consolidador_nome` (uso interno: responsavel pelo acompanhamento)
 - `contato_24h`
 - `data_contato`
 - `feedback`
@@ -1533,7 +1554,6 @@ Nao obrigatorio.
 | Fluxo | Webhook | Existe hoje? | Prioridade | Atualiza |
 |---|---|---:|---:|---|
 | Atualizacao Cadastral Completa | `/webhook_atualizacao_cadastral` | Sim | Alta | `membros`, BotConversa campos/tags/sequencias |
-| Confirmacao Cadastral 6M | `/webhook_atualizacao_cadastral` | Sim | Alta | `membros`, BotConversa campos/tags/sequencias |
 | Recadastro Anual | `/webhook_atualizacao_cadastral` | Sim | Alta | `membros`, BotConversa campos/tags/sequencias |
 | Boas Vindas / Entrada | `/webhook_evento_contato` | Nao | Baixa | `botconversa_sync_log` ou `botconversa_eventos` |
 | Visitante | `/webhook_visitante` | Nao | Alta | `consolidacao_visitantes`, tags, sequencia 24h |
@@ -1564,8 +1584,19 @@ Nao obrigatorio.
 4. `Inatividade - Encerrar ou Retomar`
 5. `Boas Vindas Filadelfia`
 6. `Mensagem Padrão - IA RUTE`
-7. `Atualização Cadastral`
-8. `Fluxo 2A - Confirmacao Cadastral Semestral`
+7. `Midia Recebida - Rute`
+8. `Pos-Atendimento - Feedback`
+9. `Atualização Cadastral`
+10. `Fluxo 2A - Recadastro Anual`
+
+### Configurar em Fluxos Padroes
+
+| Campo | Selecionar |
+|---|---|
+| Fluxo de boas vindas | `Boas Vindas Filadelfia` |
+| Fluxo de resposta padrão | `Mensagem Padrão - IA RUTE` |
+| Fluxo padrão para mídia | `Midia Recebida - Rute` |
+| Fluxo Pós-Atendimento | `Pos-Atendimento - Feedback` |
 
 ### Fase 3 - Fluxos pastorais
 
@@ -1579,8 +1610,7 @@ Nao obrigatorio.
 ### Fase 4 - Sequencias
 
 1. `SEQ - Retomar Atualizacao Cadastral`
-2. `SEQ - Revisao Cadastral 6M`
-3. `SEQ - Recadastro Anual`
+2. `SEQ - Recadastro Anual`
 4. `SEQ - Follow-up Visitante 24h`
 5. `SEQ - Pedido de Oracao Follow-up`
 

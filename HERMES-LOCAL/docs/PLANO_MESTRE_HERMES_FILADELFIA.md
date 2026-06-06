@@ -672,6 +672,25 @@ O BotConversa deve:
 - abrir atendimento humano;
 - enviar mensagens e fluxos quando o Hermes mandar.
 
+Entradas principais no sistema:
+
+| Origem | Uso pastoral |
+|---|---|
+| Redes sociais | Visitantes, interessados, pedidos de informação e campanhas |
+| Site | Primeiro contato, pedidos, eventos, células, conteúdos e formulários |
+| Campanhas | Pessoas captadas por ações específicas |
+| Grupos da igreja | Membros e líderes que precisam acessar fluxos internos |
+| Internet | Pessoas que encontraram a igreja online |
+| Células | Pessoas cadastradas ou encaminhadas por líderes |
+
+Tipos de interação:
+
+| Perfil | O que faz no BotConversa |
+|---|---|
+| Usuário comum | Verifica informações, tira dúvidas e faz solicitações |
+| Líder | Atualiza cadastro da célula, adiciona novos membros/visitantes, tira dúvida do calendário, recebe notificações do Hermes Pastoral e envia relatório da célula |
+| Pastor/equipe | Recebe alertas, relatórios, pendências, agenda e resumos operacionais |
+
 ### 12.2 Papel que o BotConversa não deve assumir sozinho
 
 O BotConversa não deve ser o banco central da igreja.
@@ -707,7 +726,51 @@ sequenceDiagram
     Agente->>BC: Opcionalmente envia fluxo/mensagem
 ```
 
-### 12.4 Webhooks prioritários
+### 12.4 Assistentes de IA no BotConversa
+
+O BotConversa deve usar assistentes de IA especialistas chamados dentro dos fluxos visuais.
+
+Decisao:
+
+```text
+Nao concentrar todo o atendimento em um unico assistente.
+A Rute Geral deve ser a recepcao e roteadora.
+Fluxos especificos devem chamar assistentes especificos quando houver texto/audio livre.
+```
+
+Assistentes planejados:
+
+| Assistente | Papel |
+|---|---|
+| `Rute Geral` | Recepcao, triagem e roteamento geral |
+| `Rute Cadastro` | Atualizacao cadastral por texto/audio |
+| `Caleb Visitantes` | Visitantes e consolidacao 24h |
+| `Caleb Celulas G12` | Celulas, G12 e trilhas |
+| `Intercessao Oracao` | Coleta de pedidos de oracao simples |
+| `Triagem Aconselhamento` | Acolhimento e encaminhamento humano |
+| `Ministerios Voluntariado` | Interesse em servir |
+| `Eventos Agenda` | Eventos confirmados e encaminhamento |
+| `Barnabe Comunicacao` | Uso interno para comunicacao e conteudo |
+| `Neemias Pastor` | Uso privado do Pastor para foco e rotina |
+
+O manual operacional desta configuracao esta em:
+
+```text
+docs/_apoio_botconversa/CONFIGURACAO_TOTAL_BOTCONVERSA_ASSISTENTES_IA.md
+```
+
+### 12.5 Regras de saida dos assistentes
+
+Cada assistente deve configurar:
+
+- `Sucesso`: objetivo concluido;
+- `Interrupcao`: humano, frustracao, crise ou fora de escopo;
+- `Inatividade`: contato sem resposta;
+- saidas condicionais sem acento e sem espaco, como `AtualizaCadastro`, `Visitante`, `PedidoOracao`, `Aconselhamento`, `CelulaG12`, `Ministerio`, `Evento`, `Humano` e `Menu`.
+
+As saidas condicionais devem iniciar outros fluxos, abrir humano ou chamar outro assistente conforme o caso.
+
+### 12.6 Webhooks prioritários
 
 | Endpoint | Prioridade | Finalidade |
 |---|---:|---|
@@ -721,7 +784,7 @@ sequenceDiagram
 | `/webhook_atendimento_humano` | Alta | Interrupções e fila humana |
 | `/webhook_evento_contato` | Baixa | Entradas, inatividade e auditoria |
 
-### 12.5 Regra técnica importante
+### 12.7 Regra técnica importante
 
 O bloco de integração do BotConversa tem timeout curto. A documentação do bloco informa saída de sucesso com time-out de 10 segundos. Por isso, os webhooks do Hermes devem:
 
@@ -1195,6 +1258,46 @@ Líder envia relatório no WhatsApp
 | Decisões de fé | Sim |
 | Observações | Não |
 
+### 19.4 Relatório 1h após a célula
+
+O sistema deve manter cadastro das células com líder, dia e horário. Uma hora após a reunião da célula, o Hermes deve acionar o líder pelo BotConversa para coletar o relatório.
+
+Fluxo:
+
+```text
+Cadastro da célula com dia/horário/líder
+    -> job identifica célula realizada
+    -> 1 hora depois chama o líder no BotConversa
+    -> assistente Caleb Relatórios Célula coleta os dados
+    -> webhook registra relatório
+    -> dashboard pastoral atualiza
+```
+
+### 19.5 Recuperação de líderes sem relatório
+
+Regra ensinada pelo Pastor:
+
+```text
+Se uma célula ficar 3 semanas sem relatório, o sistema deve informar isso ao Pastor.
+```
+
+A rotina deve:
+
+- verificar semanalmente células sem relatório;
+- enviar lembrete respeitoso ao líder;
+- aplicar status de pendência;
+- notificar o Pastor quando atingir 3 semanas sem relatório.
+
+### 19.6 Agenda para G12
+
+O Hermes deve enviar mensagem para todos os G12 com:
+
+- agenda do mês;
+- agenda da semana;
+- lembretes de eventos, reuniões, células e compromissos confirmados.
+
+O envio deve usar as etiquetas de rede G12 cadastradas no BotConversa e depender de calendário aprovado.
+
 ---
 
 ## 20. Gestor de comunicação
@@ -1231,6 +1334,25 @@ Sermão / estudo / ideia / evento
 - site;
 - e-mail, se for adotado;
 - materiais internos.
+
+### 20.4 Sermões no Spotify e notificações de culto
+
+O Pastor deseja colocar o áudio do sermão que está no Spotify dentro do Hermes. O fluxo desejado:
+
+```text
+Link do Spotify + imagem do sermão
+    -> Hermes recebe conteúdo
+    -> Barnabé Sermões resume em 1 parágrafo
+    -> mensagem é preparada com imagem + resumo + link
+    -> BotConversa envia para pessoas que aceitaram receber notificações dos cultos
+```
+
+Regras:
+
+- só enviar para quem aceitou receber notificações dos cultos;
+- não inventar conteúdo do sermão;
+- se o resumo não for baseado em transcrição/observações suficientes, pedir revisão humana;
+- idealmente permitir aprovação humana antes do disparo.
 
 ---
 
@@ -1384,6 +1506,11 @@ Mas o código deve já separar variáveis de ambiente.
 | `check_webhook_errors` | 1 h | Governança |
 | `daily_pastor_briefing` | 6h | Rute/Neemias |
 | `weekly_cells_report` | Segunda 6h | Caleb |
+| `request_cell_report_after_meeting` | 1h após a célula | Caleb |
+| `check_lideres_sem_relatorio` | Semanal | Caleb |
+| `send_agenda_mensal_g12` | Mensal | Rute |
+| `send_agenda_semanal_g12` | Segunda 7h | Rute |
+| `prepare_sermon_spotify_notification` | Após cadastro do sermão | Barnabé |
 | `monthly_finance_report` | Dia 1 | Tesoureiro |
 | `content_pipeline_review` | Segunda 8h | Barnabé |
 | `system_health_report` | Diário 7h | Governança |

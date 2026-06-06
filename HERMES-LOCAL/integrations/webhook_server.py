@@ -4,6 +4,8 @@ import sqlite3
 import sys
 import logging
 import uuid
+import os
+import time
 from datetime import datetime
 from pathlib import Path
 from starlette.applications import Starlette
@@ -35,6 +37,7 @@ from integrations.supabase_client import (
     register_webhook_event,
     update_webhook_event_status,
 )
+from hermes_v2.processor import process_botconversa_payload
 
 DB_PATH = PROJECT_ROOT / "database" / "pastoral.db"
 ENV_PATH = PROJECT_ROOT / ".env"
@@ -714,7 +717,7 @@ async def processar_atualizacao_cadastral(payload: dict) -> dict:
                 try: client.remove_tag(subscriber_id, int(config[key]))
                 except BotConversaError as exc: logger.warning(f"Erro ao remover tag {key}: {exc}")
         
-        sequences_to_add = ["sequence_revisao_cadastral_6m", "sequence_recadastro_anual"]
+        sequences_to_add = ["sequence_recadastro_anual"]
         for key in sequences_to_add:
             if config.get(key):
                 try: client.add_to_sequence(subscriber_id, int(config[key]))
@@ -879,7 +882,7 @@ async def processar_atualizacao_cadastral(payload: dict) -> dict:
                 except BotConversaError as exc: logger.warning(f"Erro ao remover tag {key}: {exc}")
                 
         if cadastro_completo:
-            sequences_to_add = ["sequence_revisao_cadastral_6m", "sequence_recadastro_anual"]
+            sequences_to_add = ["sequence_recadastro_anual"]
             for key in sequences_to_add:
                 if config.get(key):
                     try: client.add_to_sequence(subscriber_id, int(config[key]))
@@ -971,6 +974,65 @@ async def atendimento_rute_endpoint(request):
             resultado=str(exc),
         )
         return JSONResponse({"status": "error", "message": str(exc)}, status_code=500)
+
+
+def criar_visitante_pg(conn, payload: dict) -> dict:
+    nome = payload.get("nome") or payload.get("visitante_nome") or "Visitante sem nome"
+    telefone = payload.get("telefone") or payload.get("visitante_whatsapp") or payload.get("phone") or ""
+    tel_digits = normalizar_telefone(telefone)
+    
+    data_visita = payload.get("data_visita") or datetime.now().strftime("%Y-%m-%d")
+    consolidador = payload.get("consolidador_nome") or payload.get("consolidador") or "Luciane"
+    status = payload.get("status") or "Pendente"
+    
+    feedback = payload.get("feedback") or payload.get("resumo") or payload.get("resumo_ia") or ""
+    bairro = payload.get("bairro")
+    como_conheceu = payload.get("como_conheceu")
+    interesse_celula = payload.get("interesse_celula")
+    
+    infos = []
+    if bairro:
+        infos.append(f"Bairro: {bairro}")
+    if como_conheceu:
+        infos.append(f"Como conheceu: {como_conheceu}")
+    if interesse_celula:
+        infos.append(f"Interesse em célula: {interesse_celula}")
+        
+    if infos:
+        extra_feedback = " | ".join(infos)
+        feedback = f"{feedback} ({extra_feedback})" if feedback else extra_feedback
+
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        INSERT INTO public.consolidacao_visitantes (
+            data_visita,
+            visitante_nome,
+            visitante_whatsapp,
+            consolidador_nome,
+            contato_24h,
+            feedback,
+            status,
+            criado_em
+        )
+        VALUES (%s, %s, %s, %s, false, %s, %s, NOW())
+        RETURNING id
+        """,
+        (data_visita, str(nome).strip(), tel_digits or None, str(consolidador).strip(), str(feedback).strip(), status)
+    )
+    visitante_id = cursor.fetchone()[0]
+    conn.commit()
+
+    log_sync_action_conn(
+        conn,
+        acao="visitante_criado",
+        entidade_tipo="visitante",
+        entidade_id=str(visitante_id),
+        payload=payload,
+        status="Sucesso",
+        resultado=f"Visitante registrado no Supabase: {nome} (Tel: {tel_digits})"
+    )
+    return {"status": "ok", "visitante_id": visitante_id, "nome": nome, "status_consolidacao": status}
 
 
 def criar_visitante(payload: dict) -> dict:
@@ -1125,6 +1187,144 @@ def criar_relatorio_celula(payload: dict) -> dict:
     return {"status": "ok", "relatorio_id": relatorio_id, "nome_celula": nome_celula, "lider_nome": lider_nome}
 
 
+def atualizar_contato_visitante_pg(conn, payload: dict) -> dict:
+    visitante_id = payload.get("visitante_id")
+    feedback = payload.get("feedback", "")
+    status = payload.get("status", "Contatado")
+    consolidador = payload.get("consolidador_nome")
+    
+    cursor = conn.cursor()
+    
+    if consolidador:
+        cursor.execute(
+            """
+            UPDATE public.consolidacao_visitantes
+            SET contato_24h = true,
+                data_contato = CURRENT_DATE,
+                feedback = %s,
+                status = %s,
+                consolidador_nome = %s
+            WHERE id = %s
+            """,
+            (feedback, status, consolidador, visitante_id)
+        )
+    else:
+        cursor.execute(
+            """
+            UPDATE public.consolidacao_visitantes
+            SET contato_24h = true,
+                data_contato = CURRENT_DATE,
+                feedback = %s,
+                status = %s
+            WHERE id = %s
+            """,
+            (feedback, status, visitante_id)
+        )
+        
+    conn.commit()
+    
+    log_sync_action_conn(
+        conn,
+        acao="visitante_contatado",
+        entidade_tipo="visitante",
+        entidade_id=str(visitante_id),
+        payload=payload,
+        status="Sucesso",
+        resultado=f"Visitante {visitante_id} atualizado para {status} no Supabase"
+    )
+    return {"status": "ok", "visitante_id": visitante_id, "status_consolidacao": status}
+
+
+def atualizar_contato_visitante(payload: dict) -> dict:
+    conn = get_db_connection()
+    is_pg = not isinstance(conn, sqlite3.Connection)
+    
+    if is_pg:
+        try:
+            res = atualizar_contato_visitante_pg(conn, payload)
+            conn.close()
+            return res
+        except Exception as e:
+            conn.close()
+            raise e
+            
+    visitante_id = payload.get("visitante_id")
+    feedback = payload.get("feedback", "")
+    status = payload.get("status", "Contatado")
+    consolidador = payload.get("consolidador_nome")
+    
+    if not visitante_id:
+        raise ValueError("visitante_id é obrigatório para atualização")
+
+    cursor = conn.cursor()
+    
+    if consolidador:
+        cursor.execute(
+            """
+            UPDATE consolidacao_visitantes
+            SET contato_24h = 1,
+                data_contato = DATE('now'),
+                feedback = ?,
+                status = ?,
+                consolidador_nome = ?
+            WHERE id = ?
+            """,
+            (feedback, status, consolidador, visitante_id)
+        )
+    else:
+        cursor.execute(
+            """
+            UPDATE consolidacao_visitantes
+            SET contato_24h = 1,
+                data_contato = DATE('now'),
+                feedback = ?,
+                status = ?
+            WHERE id = ?
+            """,
+            (feedback, status, visitante_id)
+        )
+        
+    conn.commit()
+    conn.close()
+
+    log_sync_action(
+        acao="visitante_contatado",
+        entidade_tipo="visitante",
+        entidade_id=str(visitante_id),
+        payload=payload,
+        status="Sucesso",
+        resultado=f"Visitante {visitante_id} atualizado para {status} no SQLite"
+    )
+    return {"status": "ok", "visitante_id": visitante_id, "status_consolidacao": status}
+
+
+async def consolidacao_contato_endpoint(request):
+    payload = {}
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        logger.error(f"Payload inválido no webhook consolidação contato: {exc}")
+        return JSONResponse({"status": "error", "message": "JSON inválido."}, status_code=400)
+
+    try:
+        resultado = atualizar_contato_visitante(payload)
+        return JSONResponse(resultado)
+    except ValueError as exc:
+        logger.warning(f"Erro de validação no contato: {exc}")
+        return JSONResponse({"status": "error", "message": str(exc)}, status_code=400)
+    except Exception as exc:
+        logger.error(f"Erro ao atualizar contato de visitante: {exc}", exc_info=True)
+        log_sync_action(
+            acao="visitante_contatado",
+            entidade_tipo="erro",
+            entidade_id=str(payload.get("visitante_id", "0")),
+            payload=payload,
+            status="Erro",
+            resultado=str(exc),
+        )
+        return JSONResponse({"status": "error", "message": str(exc)}, status_code=500)
+
+
 async def visitante_endpoint(request):
     payload = {}
     try:
@@ -1180,17 +1380,489 @@ async def health_endpoint(request):
     return JSONResponse({
         "status": "ok",
         "service": "hermes-webhook",
+        "hermes_v2": "enabled",
         "supabase_configured": is_supabase_configured(),
     })
+
+
+async def botconversa_v2_endpoint(request):
+    """Hermes 2.0 single BotConversa entrypoint.
+
+    Legacy webhooks stay active below while BotConversa flows are migrated one
+    by one to this endpoint.
+    """
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        logger.error(f"Payload inválido no webhook BotConversa v2: {exc}")
+        return JSONResponse({"status": "error", "message": "JSON inválido."}, status_code=400)
+
+    try:
+        result = process_botconversa_payload(payload)
+        logger.info(
+            "Hermes v2 processou evento BotConversa: intencao=%s duplicate=%s inbox=%s",
+            result.get("intencao"),
+            result.get("duplicate"),
+            result.get("inbox_id"),
+        )
+        return JSONResponse(result)
+    except Exception as exc:
+        logger.error(f"Erro no webhook BotConversa v2: {exc}", exc_info=True)
+        return JSONResponse({"status": "error", "message": str(exc)}, status_code=500)
+
+
+# ─── NOVOS ENDPOINTS DE MÍDIA ────────────────────────────────────────────────
+
+
+def processar_evento_midia(payload: dict) -> dict:
+    """
+    Registra evento de mídia recebida no banco para BI e auditoria.
+    Chamado pelo fluxo 00 - Midia Recebida - Rute no BotConversa.
+    """
+    subscriber_id = payload.get("subscriber_id")
+    telefone = normalizar_telefone(payload.get("telefone"))
+    nome = payload.get("nome") or "Pessoa sem nome"
+    acao = payload.get("acao", "resolvido")
+    tipo_midia = payload.get("tipo_midia", "desconhecido")
+    ultima_intencao = payload.get("ultima_intencao")
+    resumo_ia = payload.get("resumo_ia", "")
+    nivel_urgencia = normalizar_urgencia(payload.get("nivel_urgencia") or "Normal")
+    ultimo_fluxo = payload.get("ultimo_fluxo_encaminhado")
+    status_atendimento = payload.get("status_atendimento")
+
+    # Tratamento amigável para chamadas de teste com variáveis cruas do BotConversa
+    is_test_raw = (
+        not subscriber_id
+        or str(subscriber_id).strip().startswith("{{")
+    )
+    if is_test_raw:
+        logger.info("Requisição de teste do webhook_midia detectada. Retornando sucesso simulado.")
+        return {"status": "ok", "message": "Conexão com webhook_midia estabelecida! (Modo Teste)"}
+
+    try:
+        subscriber_id = int(subscriber_id)
+    except (ValueError, TypeError):
+        subscriber_id = None
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    is_pg = not isinstance(conn, sqlite3.Connection)
+
+    if is_pg:
+        cursor.execute("""
+            INSERT INTO public.eventos_midia (
+                subscriber_id, telefone, nome, tipo_midia, acao,
+                ultima_intencao, ultimo_fluxo_encaminhado, resumo_ia,
+                nivel_urgencia, status_atendimento, criado_em
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+        """, (
+            subscriber_id, telefone or None, str(nome).strip(), tipo_midia, acao,
+            ultima_intencao, ultimo_fluxo, str(resumo_ia).strip(),
+            nivel_urgencia, status_atendimento,
+        ))
+    else:
+        cursor.execute("""
+            INSERT INTO eventos_midia (
+                subscriber_id, telefone, nome, tipo_midia, acao,
+                ultima_intencao, ultimo_fluxo_encaminhado, resumo_ia,
+                nivel_urgencia, status_atendimento, criado_em
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        """, (
+            subscriber_id, telefone or None, str(nome).strip(), tipo_midia, acao,
+            ultima_intencao, ultimo_fluxo, str(resumo_ia).strip(),
+            nivel_urgencia, status_atendimento,
+        ))
+
+    conn.commit()
+    conn.close()
+
+    log_sync_action(
+        acao="midia_recebida",
+        entidade_tipo="evento_midia",
+        entidade_id=str(subscriber_id or "0"),
+        payload=payload,
+        status="Sucesso",
+        resultado=f"Mídia {tipo_midia} / ação {acao} registrada para {nome}"
+    )
+
+    logger.info(f"Mídia registrada: {nome} enviou {tipo_midia} -> {acao}")
+    return {"status": "ok", "acao": acao, "tipo_midia": tipo_midia}
+
+
+async def midia_endpoint(request):
+    """Endpoint para registrar eventos de mídia recebida."""
+    payload = {}
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        logger.error(f"Payload inválido no webhook mídia: {exc}")
+        return JSONResponse({"status": "error", "message": "JSON inválido."}, status_code=400)
+
+    try:
+        resultado = processar_evento_midia(payload)
+        return JSONResponse(resultado)
+    except Exception as exc:
+        logger.error(f"Erro ao processar evento de mídia: {exc}", exc_info=True)
+        log_sync_action(
+            acao="midia_recebida",
+            entidade_tipo="erro",
+            entidade_id=str(payload.get("subscriber_id", "0")),
+            payload=payload,
+            status="Erro",
+            resultado=str(exc),
+        )
+        return JSONResponse({"status": "error", "message": str(exc)}, status_code=500)
+
+
+async def audio_tts_endpoint(request):
+    """
+    Endpoint para gerar resposta em áudio (TTS) e enviar via BotConversa.
+    Ativado pela tag [RESPOSTA_AUDIO] no fluxo do BotConversa.
+    """
+    payload = {}
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        logger.error(f"Payload inválido no webhook TTS: {exc}")
+        return JSONResponse({"status": "error", "message": "JSON inválido."}, status_code=400)
+
+    subscriber_id = payload.get("subscriber_id")
+    texto = payload.get("texto_resposta", "").strip()
+    voz = payload.get("voz", "elevenlabs")
+    nome = payload.get("nome") or "Pessoa sem nome"
+
+    if not texto:
+        return JSONResponse({"status": "error", "message": "texto_resposta é obrigatório."}, status_code=400)
+
+    # Chamada de teste do BotConversa
+    if not subscriber_id or str(subscriber_id).strip().startswith("{{"):
+        logger.info("Requisição de teste do webhook TTS detectada.")
+        return JSONResponse({"status": "ok", "message": "Conexão TTS estabelecida (modo teste)"})
+
+    try:
+        subscriber_id = int(subscriber_id)
+    except (ValueError, TypeError):
+        return JSONResponse({"status": "error", "message": "subscriber_id inválido."}, status_code=400)
+
+    try:
+        provider = voz if voz in ("elevenlabs", "openai") else "elevenlabs"
+
+        # Tenta gerar áudio com ElevenLabs ou OpenAI TTS
+        audio_bytes = None
+        tts_error = None
+
+        if provider == "elevenlabs":
+            elevenlabs_key = load_env().get("ELEVENLABS_API_KEY", "")
+            if elevenlabs_key:
+                try:
+                    import requests
+                    voice_id = load_env().get("ELEVENLABS_VOICE_ID", "21m00Tcm4TlvDq8ikWAM")
+                    url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
+                    headers = {
+                        "Accept": "audio/mpeg",
+                        "Content-Type": "application/json",
+                        "xi-api-key": elevenlabs_key,
+                    }
+                    data = {
+                        "text": texto,
+                        "model_id": "eleven_flash_v2_5",
+                        "voice_settings": {
+                            "stability": 0.5,
+                            "similarity_boost": 0.75,
+                            "style": 0.2,
+                        }
+                    }
+                    resp = requests.post(url, json=data, headers=headers, timeout=30)
+                    resp.raise_for_status()
+                    audio_bytes = resp.content
+                    logger.info(f"Áudio gerado via ElevenLabs para subscriber {subscriber_id}")
+                except Exception as exc:
+                    tts_error = str(exc)
+                    logger.warning(f"ElevenLabs falhou, tentando fallback OpenAI: {exc}")
+
+        # Fallback: OpenAI TTS se ElevenLabs falhou ou não configurado
+        if audio_bytes is None:
+            openai_key = load_env().get("OPENAI_API_KEY", "")
+            if not openai_key:
+                # Sem API configurada, simula sucesso (o BotConversa responderá em texto normal)
+                logger.warning("Nenhuma chave de TTS configurada. Resposta será apenas em texto.")
+                return JSONResponse({
+                    "status": "ok",
+                    "provider_used": "none",
+                    "message": "TTS não configurado. Responder em texto.",
+                    "texto_resposta": texto,
+                })
+
+            try:
+                import openai as openai_mod
+                client = openai_mod.OpenAI(api_key=openai_key)
+                response = client.audio.speech.create(
+                    model="tts-1",
+                    voice="nova",
+                    input=texto,
+                )
+                audio_bytes = response.content
+                provider = "openai"
+                logger.info(f"Áudio gerado via OpenAI TTS para subscriber {subscriber_id}")
+            except Exception as exc:
+                logger.error(f"OpenAI TTS também falhou: {exc}")
+                return JSONResponse({
+                    "status": "error",
+                    "message": f"Falha ao gerar áudio: {exc}",
+                    "texto_resposta": texto,
+                }, status_code=500)
+
+        # Salva arquivo de áudio temporário
+        audio_cache_dir = PROJECT_ROOT / "audio_cache"
+        audio_cache_dir.mkdir(exist_ok=True)
+        audio_filename = f"audio_{subscriber_id}_{int(time.time())}.mp3"
+        audio_path = audio_cache_dir / audio_filename
+        audio_path.write_bytes(audio_bytes)
+
+        # Envia via BotConversa API
+        client = BotConversaClient()
+        try:
+            message_result = client.send_media(
+                subscriber_id=subscriber_id,
+                media_type="audio",
+                media_value=str(audio_path),
+                caption="",
+            )
+        except BotConversaError as exc:
+            logger.warning(f"Erro ao enviar áudio via API BotConversa: {exc}")
+            message_result = {"message_id": "erro_envio"}
+
+        # Registra no banco
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        is_pg = not isinstance(conn, sqlite3.Connection)
+
+        duracao_estimada = max(1, len(texto) // 15)
+
+        if is_pg:
+            cursor.execute("""
+                INSERT INTO public.eventos_audio (
+                    subscriber_id, nome, texto_original, provider,
+                    duracao_segundos, status, criado_em
+                ) VALUES (%s, %s, %s, %s, %s, 'enviado', NOW())
+            """, (subscriber_id, str(nome).strip(), texto[:500], provider, duracao_estimada))
+        else:
+            cursor.execute("""
+                INSERT INTO eventos_audio (
+                    subscriber_id, nome, texto_original, provider,
+                    duracao_segundos, status, criado_em
+                ) VALUES (?, ?, ?, ?, ?, 'enviado', CURRENT_TIMESTAMP)
+            """, (subscriber_id, str(nome).strip(), texto[:500], provider, duracao_estimada))
+
+        conn.commit()
+        conn.close()
+
+        logger.info(f"Áudio de {duracao_estimada}s enviado para subscriber {subscriber_id} via {provider}")
+
+        return JSONResponse({
+            "status": "ok",
+            "provider_used": provider,
+            "audio_file": audio_filename,
+            "audio_duration_seconds": duracao_estimada,
+        })
+
+    except Exception as exc:
+        logger.error(f"Erro no endpoint TTS: {exc}", exc_info=True)
+        return JSONResponse({
+            "status": "error",
+            "message": str(exc),
+            "texto_resposta": texto,
+        }, status_code=500)
+
+
+async def documento_endpoint(request):
+    """
+    Endpoint para processar documentos (PDF, DOCX, XLSX) recebidos no WhatsApp.
+    Extrai texto do documento e retorna para o BotConversa continuar o fluxo.
+    """
+    payload = {}
+    try:
+        payload = await request.json()
+    except Exception as exc:
+        logger.error(f"Payload inválido no webhook documento: {exc}")
+        return JSONResponse({"status": "error", "message": "JSON inválido."}, status_code=400)
+
+    subscriber_id = payload.get("subscriber_id")
+    tipo_documento = payload.get("tipo_documento", "pdf")
+    nome = payload.get("nome") or "Pessoa sem nome"
+    telefone = payload.get("telefone")
+
+    # Chamada de teste do BotConversa
+    if not subscriber_id or str(subscriber_id).strip().startswith("{{"):
+        logger.info("Requisição de teste do webhook_documento detectada.")
+        return JSONResponse({
+            "status": "ok",
+            "message": "Conexão com webhook_documento estabelecida! (Modo Teste)",
+            "texto_extraido": "[MODO TESTE] Texto extraído do documento apareceria aqui.",
+        })
+
+    texto_extraido = ""
+    erro = None
+
+    try:
+        tipo_doc = str(tipo_documento).lower().strip()
+        url_arquivo = payload.get("url_arquivo", "")
+
+        if not url_arquivo:
+            texto_extraido = payload.get("mensagem_usuario") or ""
+            if not texto_extraido:
+                erro = "url_arquivo não fornecida"
+        else:
+            import requests as req_lib
+
+            if tipo_doc in ("pdf",):
+                try:
+                    import fitz  # PyMuPDF
+                    resp = req_lib.get(url_arquivo, timeout=30)
+                    resp.raise_for_status()
+                    import tempfile
+                    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+                        tmp.write(resp.content)
+                        tmp_path = tmp.name
+                    doc = fitz.open(tmp_path)
+                    textos_pag = []
+                    for page in doc:
+                        textos_pag.append(page.get_text())
+                    texto_extraido = "\n".join(textos_pag)
+                    doc.close()
+                    os.unlink(tmp_path)
+                except ImportError:
+                    erro = "pymupdf não instalado. pip install pymupdf"
+                except Exception as exc:
+                    erro = f"Erro ao extrair PDF: {exc}"
+
+            elif tipo_doc in ("docx", "doc"):
+                try:
+                    from docx import Document as DocxDocument
+                    resp = req_lib.get(url_arquivo, timeout=30)
+                    resp.raise_for_status()
+                    import tempfile
+                    with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as tmp:
+                        tmp.write(resp.content)
+                        tmp_path = tmp.name
+                    doc = DocxDocument(tmp_path)
+                    texto_extraido = "\n".join(p.text for p in doc.paragraphs)
+                    os.unlink(tmp_path)
+                except ImportError:
+                    erro = "python-docx não instalado. pip install python-docx"
+                except Exception as exc:
+                    erro = f"Erro ao extrair DOCX: {exc}"
+
+            elif tipo_doc in ("xlsx", "xls"):
+                try:
+                    import pandas as pd
+                    resp = req_lib.get(url_arquivo, timeout=30)
+                    resp.raise_for_status()
+                    import tempfile
+                    with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as tmp:
+                        tmp.write(resp.content)
+                        tmp_path = tmp.name
+                    dfs = pd.read_excel(tmp_path, sheet_name=None)
+                    textos = []
+                    for sheet_name, df in dfs.items():
+                        textos.append(f"--- Aba: {sheet_name} ---")
+                        textos.append(df.to_string(index=False))
+                    texto_extraido = "\n".join(textos)
+                    os.unlink(tmp_path)
+                except ImportError:
+                    erro = "pandas não instalado. pip install pandas openpyxl"
+                except Exception as exc:
+                    erro = f"Erro ao extrair XLSX: {exc}"
+            else:
+                erro = f"Tipo de documento não suportado: {tipo_doc}"
+
+        # Limita tamanho do texto extraído
+        if texto_extraido and len(texto_extraido) > 50000:
+            texto_extraido = texto_extraido[:50000] + "\n\n[... documento truncado por exceder 50000 caracteres]"
+
+        # Registra no banco
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        is_pg = not isinstance(conn, sqlite3.Connection)
+
+        if is_pg:
+            cursor.execute("""
+                INSERT INTO public.eventos_documento (
+                    subscriber_id, nome, telefone, tipo_documento,
+                    total_chars, status, erro, criado_em
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
+            """, (
+                int(subscriber_id) if subscriber_id else None,
+                str(nome).strip(),
+                telefone or None,
+                tipo_doc,
+                len(texto_extraido),
+                "erro" if erro else "sucesso",
+                erro,
+            ))
+        else:
+            cursor.execute("""
+                INSERT INTO eventos_documento (
+                    subscriber_id, nome, telefone, tipo_documento,
+                    total_chars, status, erro, criado_em
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            """, (
+                int(subscriber_id) if subscriber_id else None,
+                str(nome).strip(),
+                telefone or None,
+                tipo_doc,
+                len(texto_extraido),
+                "erro" if erro else "sucesso",
+                erro,
+            ))
+
+        conn.commit()
+        conn.close()
+
+        if erro:
+            logger.warning(f"Documento processado com erro para {nome}: {erro}")
+            return JSONResponse({
+                "status": "error",
+                "message": erro,
+                "texto_extraido": f"[Erro ao processar documento: {erro}]",
+            }, status_code=422)
+
+        logger.info(f"Documento processado: {nome} enviou {tipo_doc} ({len(texto_extraido)} chars)")
+
+        # Trunca a resposta para evitar payloads gigantes (o BotConversa tem limite)
+        texto_resposta = texto_extraido[:15000] if len(texto_extraido) > 15000 else texto_extraido
+        if len(texto_extraido) > 15000:
+            texto_resposta += "\n\n[... documento truncado para exibição no WhatsApp. Conteúdo completo registrado no banco.]"
+
+        return JSONResponse({
+            "status": "ok",
+            "texto_extraido": texto_resposta,
+            "total_chars": len(texto_extraido),
+            "tipo_documento": tipo_doc,
+        })
+
+    except Exception as exc:
+        logger.error(f"Erro no endpoint documento: {exc}", exc_info=True)
+        return JSONResponse({
+            "status": "error",
+            "message": str(exc),
+            "texto_extraido": f"[Erro ao processar documento: {exc}]",
+        }, status_code=500)
 
 
 # Rotas da Starlette
 routes = [
     Route("/health", endpoint=health_endpoint, methods=["GET"]),
+    Route("/webhook/botconversa", endpoint=botconversa_v2_endpoint, methods=["POST"]),
     Route("/webhook_atualizacao_cadastral", endpoint=webhook_endpoint, methods=["POST"]),
     Route("/webhook_atendimento_rute", endpoint=atendimento_rute_endpoint, methods=["POST"]),
     Route("/webhook_visitante", endpoint=visitante_endpoint, methods=["POST"]),
+    Route("/webhook_consolidacao_contato", endpoint=consolidacao_contato_endpoint, methods=["POST"]),
     Route("/webhook_g12_celulas", endpoint=g12_celulas_endpoint, methods=["POST"]),
+    # NOVOS ENDPOINTS DE MÍDIA
+    Route("/webhook_midia", endpoint=midia_endpoint, methods=["POST"]),
+    Route("/webhook_audio_tts", endpoint=audio_tts_endpoint, methods=["POST"]),
+    Route("/webhook_documento", endpoint=documento_endpoint, methods=["POST"]),
 ]
 
 app = Starlette(debug=True, routes=routes)

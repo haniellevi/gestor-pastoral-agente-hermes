@@ -76,7 +76,6 @@ REQUIRED_BOTCONVERSA_TAGS = [
     "Pedido de Aconselhamento",
     "Humano Necessário",
     "Em Atendimento Humano",
-    "Atualização 6M Agendada",
     "Recadastro Anual Agendado",
     "Atualização Recusada",
     "Atualização Confirmada Sem Alteração",
@@ -106,17 +105,17 @@ REQUIRED_BOTCONVERSA_FIELDS = [
     "Ultima_Intencao",
     "Encaminhamento_Necessario",
     "Nivel_Urgencia",
-    "Proxima_Atualizacao_Cadastral",
-    "Proximo_Recadastro_Anual",
+    "Prox_Recadastro",
 ]
 
 REQUIRED_BOTCONVERSA_FLOWS = [
     "Boas Vindas Filadelfia",
     "Mensagem Padrão - IA RUTE",
+    "Midia Recebida - Rute",
+    "Pos-Atendimento - Feedback",
     "Atualização Cadastral",
     "VISITANTE",
     "Encerrar Conversa",
-    "Confirmação Cadastral 6M",
     "Recadastro Anual",
     "Pedido de Oração",
     "Pedido de Aconselhamento",

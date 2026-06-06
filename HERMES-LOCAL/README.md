@@ -4,6 +4,31 @@ Este diretório contém a estrutura de configuração local, scripts auxiliares 
 
 ---
 
+## Hermes 2.0 MVP
+
+A versão 2.0 simplifica a operação em torno de um webhook único e um painel operacional enxuto.
+
+- Webhook principal: `POST /webhook/botconversa`
+- Health check: `GET /health`
+- Dashboard padrão: `dashboard/app_v2.py`
+- Dashboard legado preservado: `dashboard/app.py`
+- Documento técnico: `docs/HERMES_2_0_IMPLEMENTACAO.md`
+- Migration Supabase: `supabase/migrations/20260605143000_hermes_v2_mvp.sql`
+
+Para rodar o painel v2 localmente:
+
+```bash
+streamlit run dashboard/app_v2.py
+```
+
+Para rodar a API local:
+
+```bash
+uvicorn integrations.webhook_server:app --host 0.0.0.0 --port 5050
+```
+
+---
+
 ## 🛠️ 1. Como Instalar o Hermes Agent Localmente no seu Windows
 
 O script de instalação oficial da Nous Research provisiona automaticamente o **Python 3.11**, **Node.js**, **uv (gerenciador de pacotes)**, **ripgrep** e **ffmpeg**, isolando a instalação em `%LOCALAPPDATA%\hermes`.
@@ -79,4 +104,3 @@ Esta funcionalidade permite que a agente **Rute** sincronize de forma bidirecion
    python integrations/google_calendar_sync.py
    ```
    Os novos compromissos criados no banco local serão enviados para a agenda Google, e os eventos criados no celular nos últimos 7 dias / próximos 30 dias serão importados para o banco SQLite com categorização automática!
-

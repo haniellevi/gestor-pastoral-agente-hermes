@@ -73,7 +73,35 @@ def testar_visitante():
         "interesse_celula": "Sim",
         "resumo": "Visitou o culto de domingo e deseja conhecer uma célula no Setor Oeste."
     }
-    enviar_post("/webhook_visitante", payload)
+    res = enviar_post("/webhook_visitante", payload)
+    
+    if res and res.get("visitante_id"):
+        visitante_id = res["visitante_id"]
+        print(f"\n--- Testando Webhook Consolidação Contato (Visitante ID: {visitante_id}) ---")
+        payload_contato = {
+            "visitante_id": visitante_id,
+            "consolidador_nome": "Luciane",
+            "feedback": "Liguei para o Carlos, ele foi super educado e confirmou presença na célula Shammah desta quarta-feira!",
+            "status": "Contatado"
+        }
+        enviar_post("/webhook_consolidacao_contato", payload_contato)
+
+def testar_webhook_midia():
+    print("\n--- Testando Webhook Mídia (Áudio de Oração) ---")
+    payload = {
+        "subscriber_id": "999999",
+        "telefone": "5589988887777",
+        "nome": "Membro Teste Mídia",
+        "acao": "encaminhado",
+        "tipo_midia": "audio",
+        "ultima_intencao": "Pedido_Oracao",
+        "ultimo_fluxo_encaminhado": "Pedido de Oracao",
+        "resumo_ia": "Pessoa enviou áudio pedindo oração pela recuperação de sua tia no hospital.",
+        "nivel_urgencia": "Normal",
+        "status_atendimento": "Encaminhado"
+    }
+    enviar_post("/webhook_midia", payload)
+
 
 def testar_g12_celulas():
     print("\n--- Testando Webhook G12 Células (Relatório Semanal) ---")
@@ -92,4 +120,5 @@ if __name__ == "__main__":
     testar_atendimento_rute()
     testar_atualizacao_cadastral()
     testar_visitante()
+    testar_webhook_midia()
     testar_g12_celulas()

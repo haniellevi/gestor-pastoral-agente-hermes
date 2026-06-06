@@ -45,7 +45,7 @@ flowchart TD
 | Fluxos visuais | Executam passos exatos | Cadastro, etiquetas, sequências e webhooks precisam ser previsíveis |
 | Campos personalizados | Guardam dados do contato | Permitem saber bairro, célula, líder, G12, ministérios, status |
 | Etiquetas | Marcam estado operacional | Permitem segmentar, filtrar, encaminhar e impedir confusão |
-| Sequências | Fazem follow-up por tempo | Retomar cadastro, revisar em 6 meses, consolidar visitante em 24h |
+| Sequências | Fazem follow-up por tempo | Retomar cadastro, recadastro anual, consolidar visitante em 24h |
 | Webhook Hermes | Liga BotConversa ao sistema local | Salva dados no SQLite e sincroniza com o dashboard |
 | Dashboard | Mostra métricas e pendências | O Pastor enxerga cuidado, cadastro, consolidação e comunicação |
 
@@ -80,7 +80,7 @@ flowchart TD
 
     UI --> COND{"Qual intenção?"}
 
-    COND -->|Atualizacao_Cadastral| C2["Fluxo 2A<br/>Confirmação Cadastral"]
+    COND -->|Atualizacao_Cadastral| C2["Fluxo 2A<br/>Atualização ou Recadastro"]
     COND -->|Visitante| C3["Fluxo 3<br/>Visitante"]
     COND -->|Pedido_Oracao| C4["Pedido de Oração"]
     COND -->|Aconselhamento| C5["Pedido de Aconselhamento<br/>Humano Necessário"]
@@ -114,8 +114,7 @@ flowchart TD
 flowchart TB
     F1["1. Boas Vindas Filadélfia"]
     F2["2. Atualização Cadastral Completa"]
-    F2A["2A. Confirmação Cadastral Semestral"]
-    F2B["2B. Recadastro Anual"]
+    F2A["2A. Recadastro Anual"]
     F3["3. Visitante / Consolidação 24h"]
     F4["4. Mensagem Padrão - IA Rute"]
     F5["5. Pedido de Oração"]
@@ -140,7 +139,6 @@ flowchart TB
     F4 --> F10
 
     F2A --> F2
-    F2B --> F2
 ```
 
 ### Por que cada fluxo existe
@@ -149,8 +147,7 @@ flowchart TB
 |---|---|---|
 | Boas Vindas | Receber e classificar contato | Primeiro contato precisa de caminho simples e controlado |
 | Atualização Cadastral | Coletar dados obrigatórios | Cadastro exige campos específicos e confirmação |
-| Confirmação Semestral | Ver se dados continuam iguais | Evita recadastro longo quando nada mudou |
-| Recadastro Anual | Revisão completa anual | Mantém base limpa e pastoralmente útil |
+| Recadastro Anual | Ver uma vez por ano se os dados continuam iguais | Mantém base limpa sem cansar membros |
 | Visitante | Garantir consolidação em 24h | Visitante não pode ficar perdido em conversa livre |
 | IA Rute | Responder e rotear mensagens livres | A pessoa pode escrever de muitos jeitos diferentes |
 | Pedido de Oração | Registrar cuidado espiritual | Separa oração de cadastro e agenda |
@@ -168,7 +165,7 @@ flowchart TB
 flowchart LR
     E["Etiquetas"] --> V["Vínculo<br/>Membro / Visitante / Outro"]
     E --> C["Cadastro<br/>Completo / Incompleto / Pendente"]
-    E --> A["Atualização<br/>Concluída / Recusada / 6M / Anual"]
+    E --> A["Atualização<br/>Concluída / Recusada / Anual"]
     E --> P["Pastoral<br/>Oração / Aconselhamento / Humano"]
     E --> G["Células e G12<br/>Célula / G12 Pastoral"]
     E --> M["Ministério<br/>Interesse ou área específica"]
@@ -189,7 +186,6 @@ flowchart LR
 | `Atualização Pendente` | Precisa atualizar neste ciclo |
 | `Atualização Recusada` | Pessoa recusou ou adiou |
 | `Atualização Confirmada Sem Alteração` | Confirmou que nada mudou |
-| `Atualização 6M Agendada` | Está na revisão semestral |
 | `Recadastro Anual Agendado` | Está na rotina anual |
 | `Consolidação 24h` | Visitante precisa de contato rápido |
 | `Pedido de Oração` | Pedido registrado para intercessão |
@@ -236,8 +232,7 @@ flowchart TD
 | `Feedback_Melhorias` | Ouvir sugestões da igreja |
 | `Feedback_falta` | Perceber dores e necessidades |
 | `Ultima_Atualiz_Cadas` | Saber quando o cadastro foi atualizado |
-| `Proxima_Atualizacao_Cadastral` | Programar revisão semestral |
-| `Proximo_Recadastro_Anual` | Programar recadastro anual |
+| `Prox_Recadastro` | Programar recadastro anual |
 | `Status_Cadastro` | Completo, Incompleto, Atualizar ou Recusou |
 | `Tipo_Vinculo` | Membro, Visitante, Líder ou Outro |
 | `Resumo_Atend_IA` | Auditoria da conversa com IA |
@@ -260,9 +255,9 @@ flowchart TD
     FL --> WH["Chamar webhook Hermes"]
     WH --> DB["Atualizar membros no SQLite"]
     DB --> CHECK{"Cadastro completo?"}
-    CHECK -->|Sim| OK["Aplicar Cadastro Completo<br/>Atualização Cadastral<br/>inscrever 6M/anual"]
+    CHECK -->|Sim| OK["Aplicar Cadastro Completo<br/>Atualização Cadastral<br/>inscrever recadastro anual"]
     CHECK -->|Não| PEND["Manter Cadastro Incompleto<br/>pedir dados faltantes"]
-    C -->|Sim| CONF["Confirmação Cadastral 6M"]
+    C -->|Sim| CONF["Recadastro Anual, se vencido"]
 ```
 
 ### Campos mínimos para membro
@@ -304,7 +299,7 @@ sequenceDiagram
     WH->>DB: Atualiza tabela membros
     WH->>API: Atualiza campos personalizados
     WH->>API: Aplica/remove etiquetas
-    WH->>API: Inscreve sequências 6M/anual se completo
+    WH->>API: Inscreve sequência anual se completo
     DB->>Pessoa: Dashboard passa a refletir os dados
 ```
 
@@ -325,7 +320,7 @@ POST /webhook_atualizacao_cadastral
 | Verifica se cadastro ficou completo | Decide status final |
 | Atualiza campos no BotConversa | Mantém a plataforma sincronizada |
 | Aplica/remove etiquetas | Atualiza estado operacional |
-| Inscreve em sequências | Agenda revisão 6M e recadastro anual |
+| Inscreve em sequências | Agenda recadastro anual |
 | Grava `botconversa_sync_log` | Permite auditoria |
 
 ---
@@ -336,13 +331,13 @@ POST /webhook_atualizacao_cadastral
 flowchart TD
     V["Pessoa diz que é visitante<br/>ou quer conhecer"] --> TAG["Aplicar Visitante<br/>Aplicar Consolidação 24h"]
     TAG --> DADOS["Coletar nome, telefone, bairro,<br/>como conheceu, interesse em célula"]
-    DADOS --> RESP["Definir consolidador responsável"]
+    DADOS --> RESP["Definir pessoa da equipe<br/>para acompanhar"]
     RESP --> SEQ["Inscrever em<br/>SEQ - Follow-up Visitante 24h"]
     SEQ --> HUM["Notificar equipe/liderança"]
     HUM --> DASH["Futuro: alimentar dashboard de consolidação"]
 ```
 
-**Por que este fluxo existe:** visitante precisa ser cuidado rapidamente. A etiqueta `Consolidação 24h` torna visível quem ainda precisa de contato.
+**Por que este fluxo existe:** visitante precisa ser cuidado rapidamente por alguem proximo. A etiqueta `Consolidação 24h` torna visível internamente quem ainda precisa de contato, mas a palavra "consolidador" nao deve ser usada com o visitante.
 
 Campos recomendados:
 
@@ -352,7 +347,7 @@ Campos recomendados:
 | `Bairro` | Indicar célula próxima |
 | `Como_Conheceu_Igreja` | Entender origem do visitante |
 | `Disponibilidade_Celula` | Facilitar encaminhamento |
-| `Consolidador_Responsavel` | Saber quem vai cuidar |
+| `Consolidador_Responsavel` | Uso interno: saber quem vai acompanhar |
 | `Status_Consolidacao` | Pendente, Contatado, Integrado ou Desistiu |
 
 ---
@@ -382,7 +377,6 @@ Com `Status_Atendimento_IA`, `Ultima_Intencao` e `Ultimo_Fluxo_Encaminhado`, o B
 | Sequência | Quando entra | Quando sai | Por que existe |
 |---|---|---|---|
 | `SEQ - Retomar Atualizacao Cadastral` | Pessoa adia ou abandona cadastro | Conclui cadastro | Evitar cadastro eternamente incompleto |
-| `SEQ - Revisao Cadastral 6M` | Cadastro confirmado/concluído | Inicia nova revisão | Manter dados sensíveis atualizados |
 | `SEQ - Recadastro Anual` | Cadastro completo | Inicia recadastro anual | Fazer revisão completa 1 vez ao ano |
 | `SEQ - Follow-up Visitante 24h` | Visitante registrado | Integrado/desistiu/contatado | Garantir cuidado rápido |
 | `SEQ - Pedido de Oracao Follow-up` | Pedido de oração sem crise | Acompanhamento concluído | Demonstrar cuidado após intercessão |
@@ -433,7 +427,7 @@ flowchart TD
     VINC -->|Outro| RUTE["IA Rute ou Humano"]
 
     FULL -->|Sim| CICLO{"Atualização do ciclo atual feita?"}
-    CICLO -->|Não| CONF["Confirmação Cadastral Semestral"]
+    CICLO -->|Não| CONF["Recadastro Anual"]
     CICLO -->|Sim| RUTE2["IA Rute Geral"]
 
     RUTE2 --> INT{"Intenção detectada"}
@@ -459,7 +453,7 @@ flowchart TD
 | 4 | Fluxo Atualização Cadastral | Base limpa para qualquer estratégia |
 | 5 | Webhook cadastral | Liga BotConversa ao Hermes e dashboard |
 | 6 | IA Rute geral com saídas | Roteia mensagens livres sem bagunça |
-| 7 | Confirmação semestral | Mantém dados atualizados sem cansar membros |
+| 7 | Recadastro anual | Mantém dados atualizados sem cansar membros |
 | 8 | Visitante / Consolidação 24h | Garante cuidado rápido com novos contatos |
 | 9 | Oração, aconselhamento, célula, ministério e eventos | Expande cuidado por área |
 | 10 | Sequências e automações por tempo | Fecha o ciclo de acompanhamento |

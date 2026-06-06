@@ -22,8 +22,8 @@ if %errorlevel% neq 0 (
 echo.
 
 :: 2. Iniciando o Dashboard Streamlit em segundo plano
-echo [2/5] Iniciando o Dashboard Streamlit (BI)...
-start "Dashboard Gestao Pastoral" cmd /k ""%PYTHON_EXE%" -m streamlit run dashboard/app.py"
+echo [2/5] Iniciando o Dashboard Hermes 2.0...
+start "Dashboard Hermes 2.0" cmd /k ""%PYTHON_EXE%" -m streamlit run dashboard/app_v2.py"
 echo.
 
 :: 3. Iniciando o Servidor de Webhook do Hermes
@@ -49,4 +49,3 @@ echo ===================================================
 echo   Inicializadores abertos em janelas separadas!
 echo ===================================================
 pause
-

@@ -48,12 +48,36 @@ Este arquivo serve como o painel de progresso geral do ecossistema. Ele deve ser
 - [x] Propagar domínio oficial.
 - [x] Validar `https://api.filadelfiacorrente.com/health` e `https://painel.filadelfiacorrente.com` em produção.
 
+### Hermes 2.0 MVP
+- [x] Criar camada `hermes_v2/` com normalização, classificação, idempotência, inbox e tarefas.
+- [x] Criar migration Supabase para `event_logs`, `inbox_pastoral` e `tarefas_pastorais`.
+- [x] Adicionar webhook único `POST /webhook/botconversa` mantendo rotas legadas ativas.
+- [x] Criar dashboard operacional enxuto em `dashboard/app_v2.py`.
+- [x] Atualizar Docker/local scripts para abrir o dashboard Hermes 2.0 por padrão.
+- [x] Registrar congelamento da v1 em `docs/v1-legado/README.md`.
+- [x] Adicionar testes automatizados da v2 em `database/test_hermes_v2.py`.
+
 ---
 
 ## 🟡 Em Andamento
 
 ### 💬 Fase 3: Integração em Produção com BotConversa
 - [ ] Substituir URL temporária do Ngrok pela URL oficial HTTPS nos blocos de integração do BotConversa.
+- [ ] Rodar a migration `supabase/migrations/20260605143000_hermes_v2_mvp.sql` no Supabase de produção.
+- [ ] Configurar um fluxo piloto do BotConversa para `POST /webhook/botconversa`.
+- [x] Verificar inventário real de etiquetas, campos, fluxos e sequências do BotConversa.
+- [x] Criar inventário da Fase 3 em `docs/_apoio_botconversa/INVENTARIO_BOTCONVERSA_FASE_3_HERMES_2.md`.
+- [x] Criar guia passo a passo em `docs/_apoio_botconversa/PASSO_A_PASSO_FLUXOS_BOTCONVERSA_HERMES_2.md`.
+- [x] Atualizar checklist de execução dos fluxos para Hermes 2.0.
+- [x] Criar plano de recadastro anual para toda a base em `docs/_apoio_botconversa/PLANO_RECADASTRO_ANUAL_TODA_BASE.md`.
+- [ ] Criar etiqueta `Atualização Recusada` no BotConversa.
+- [ ] Criar `SEQ - Recadastro Anual`.
+- [ ] Criar `SEQ - Follow-up Visitante 24h`.
+- [ ] Criar `SEQ - Retomar Atualizacao Cadastral`.
+- [ ] Criar `SEQ - Pedido de Oracao Follow-up`.
+- [ ] Parar de usar `Revisao 6M Agend` e `SEQ - Revisao Cadastral 6M`.
+- [ ] Padronizar `1-  RUTE SECRETARIA` para `1- RUTE SECRETARIA`.
+- [ ] Definir `0000 - Encerrar Conversa` como encerramento oficial e substituir conexões para `2- Encerrar Conversa`.
 - [ ] Validar recebimento de webhooks a partir de interações reais no WhatsApp.
 - [ ] Ligar etiquetas (`Membro`, `Visitante`, `Consolidação 24h`) e campos personalizados reais às ações dos webhooks.
 

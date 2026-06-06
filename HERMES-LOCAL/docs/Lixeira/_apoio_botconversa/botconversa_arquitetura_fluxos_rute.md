@@ -7,7 +7,7 @@ Este documento define a logica completa dos fluxos pastorais da Igreja Batista F
 - Etiquetas para estado operacional.
 - Campos personalizados para dados pastorais.
 - Sequencias para retorno por tempo.
-- Webhooks/API Hermes para verificacao semestral/anual e sincronizacao com SQLite.
+- Webhooks/API Hermes para verificacao anual e sincronizacao com SQLite.
 
 ## Fontes e capacidades confirmadas
 
@@ -18,6 +18,8 @@ Documentacao BotConversa consultada:
 - Sequencias permitem programar fluxos depois de minutos, horas ou dias.
 - Boas Vindas e enviado apenas 1 vez para novos contatos.
 - Resposta Padrao recebe mensagens que nao batem com palavra-chave, desde que nao exista fluxo aguardando resposta.
+- Fluxo padrão para mídia recebe anexos enviados fora de fluxos que aguardam entrada específica.
+- Fluxo Pós-Atendimento roda quando uma conversa é marcada como concluída.
 - Ordem de prioridade de acionamento: Campanha, Palavra-chave, Boas Vindas, Resposta Padrao.
 - Bloco de acao pode notificar admins.
 - Acao `Atribuir e abrir atendimento` encaminha para departamento/atendente e impede o robo de continuar respondendo enquanto a conversa esta aberta.
@@ -28,10 +30,21 @@ Documentacao BotConversa consultada:
 ### Fluxos existentes
 
 - `Atualização Cadastral`
-- `Boas Vindas Filadelfia`
+- `0- Boas Vindas Filadelfia`
 - `Encerrar Conversa`
-- `Mensagem Padrão - IA RUTE`
+- `1- RUTE SECRETARIA`
+- `00 - Midia Recebida - Rute`
+- `000- Pos-atendimento - Feedback`
 - `VISITANTE`
+
+### Fluxos padroes a configurar
+
+| Campo no BotConversa | Fluxo | Funcao |
+|---|---|---|
+| Fluxo de boas vindas | `0- Boas Vindas Filadelfia` | Primeiro contato, apenas uma vez |
+| Fluxo de resposta padrão | `1- RUTE SECRETARIA` | Mensagem livre sem palavra-chave |
+| Fluxo padrão para mídia | `00 - Midia Recebida - Rute` | Anexo fora de contexto |
+| Fluxo Pós-Atendimento | `000- Pos-atendimento - Feedback` | Feedback apos conversa concluida |
 
 ### Etiquetas existentes
 
@@ -57,7 +70,6 @@ Documentacao BotConversa consultada:
 - `Pedido de Aconselhamento`
 - `Humano Necessário`
 - `Em Atendimento Humano`
-- `Atualização 6M Agendada`
 - `Recadastro Anual Agendado`
 - `Atualização Recusada`
 - `Atualização Confirmada Sem Alteração`
@@ -99,8 +111,7 @@ Campos:
 - Criar `Ultima_Intencao` como texto.
 - Criar `Encaminhamento_Necessario` como texto.
 - Criar `Nivel_Urgencia` como texto: `Baixa`, `Media`, `Alta`, `Crise`.
-- Criar `Proxima_Atualizacao_Cadastral` como data, se o BotConversa aceitar data.
-- Criar `Proximo_Recadastro_Anual` como data, se o BotConversa aceitar data.
+- Criar `Prox_Recadastro` como data, se o BotConversa aceitar data.
 
 ## Principio de desenho
 
@@ -168,14 +179,23 @@ Configuracao recomendada no bloco `Assistente GPT` da Rute geral:
 3. Em `Campos Personalizados`, configurar:
    - `Ultima_Intencao`: salvar uma das intencoes padronizadas.
    - `Precisa_Encaminhar`: salvar `Sim` quando a conversa deve sair da IA geral.
-4. Na saida `Resposta bem-sucedida`, conectar em um bloco de condicoes.
-5. O bloco de condicoes verifica `Ultima_Intencao` e envia para o fluxo certo.
+4. Se as saidas condicionais aparecerem direto no bloco visual, conectar cada saida ao fluxo certo.
+5. Usar `Resposta bem-sucedida` apenas para conversa resolvida sem encaminhamento.
+6. Usar `Resposta falha` para mensagem segura ou atendimento humano.
+7. Usar `Inatividade` para lembrete curto ou encerramento.
+
+Plano B:
+
+```text
+Se as saidas condicionais nao aparecerem no bloco visual, conectar `Resposta bem-sucedida` em um bloco de condicoes.
+Esse bloco verifica `Ultima_Intencao` e `Precisa_Encaminhar` para enviar ao fluxo certo.
+```
 
 Mapa de roteamento:
 
-| `Ultima_Intencao` | Acao do BotConversa |
+| Saida direta ou `Ultima_Intencao` | Acao do BotConversa |
 |---|---|
-| `Atualizacao_Cadastral` | Iniciar `Fluxo 2A - Confirmacao Cadastral Semestral` |
+| `Atualizacao_Cadastral` | Iniciar `Atualização Cadastral` ou `Recadastro Anual` |
 | `Visitante` | Iniciar `VISITANTE` |
 | `Pedido_Oracao` | Iniciar fluxo de pedido de oracao/intercessao |
 | `Aconselhamento` | Atribuir e abrir atendimento humano |
@@ -273,9 +293,8 @@ Nao misturar tudo dentro de um unico assistente. A Rute deve ser o roteador cord
 
 - `Cadastro Completo`: dados obrigatorios minimos preenchidos.
 - `Cadastro Incompleto`: faltam dados obrigatorios.
-- `Atualização Cadastral`: atualizacao do ciclo vigente concluida.
-- `Atualização Pendente`: precisa atualizar no ciclo atual.
-- `Atualização 6M Agendada`: contato inscrito na sequencia de revisao semestral.
+- `Atualização Cadastral`: cadastro inicial ou recadastro vigente concluido.
+- `Atualização Pendente`: cadastro inicial ou recadastro anual pendente.
 - `Recadastro Anual Agendado`: contato inscrito na sequencia anual.
 
 ### Campos obrigatorios para considerar cadastro completo
@@ -306,7 +325,7 @@ Desejaveis:
 - `Feedback_Melhorias`.
 - `Feedback_falta`.
 
-## Fluxo 1 - Boas Vindas Filadelfia
+## Fluxo 1 - 0- Boas Vindas Filadelfia
 
 Objetivo:
 
@@ -323,7 +342,7 @@ Ramos:
 
 ### A. Tem `Cadastro Completo` e tem `Atualização Cadastral`
 
-Enviar para `Mensagem Padrão - IA RUTE`.
+Enviar para `1- RUTE SECRETARIA`.
 
 Mensagem:
 
@@ -333,7 +352,7 @@ Graça e Paz! Eu sou a Rute. Como posso ajudar voce hoje?
 
 ### B. Tem `Cadastro Completo`, mas nao tem `Atualização Cadastral`
 
-Enviar para `Fluxo 2A - Confirmacao Cadastral Semestral`.
+Enviar para `Recadastro Anual`.
 
 Mensagem:
 
@@ -364,9 +383,37 @@ Botoes:
 Acoes:
 
 - `Sou membro`: aplicar `Membro`, aplicar `Cadastro Incompleto`, enviar para `Atualização Cadastral`.
-- `Sou visitante`: aplicar `Visitante`, enviar para `VISITANTE`.
-- `Quero conhecer`: aplicar `Visitante`, mandar mensagem com culto/endereco e oferecer consolidacao.
+- `Sou visitante`: aplicar `Visitante`, salvar `Tipo_Vinculo = Visitante`, abrir menu `Permitir Acompanhamento Visitante`.
+- `Quero conhecer`: aplicar `Visitante`, salvar `Tipo_Vinculo = Visitante`, abrir menu `Permitir Acompanhamento Visitante`.
 - `Outro vínculo`: aplicar `Outro-Vinculo`, enviar para Rute ou humano conforme resposta.
+
+### Menu `Permitir Acompanhamento Visitante`
+
+Mensagem:
+
+```text
+*Que alegria receber voce!* 😊
+
+Queremos te acolher com carinho.
+
+Posso pedir para *alguem da nossa igreja* falar com voce com calma e te ajudar nos proximos passos?
+```
+
+Conexoes obrigatorias:
+
+| Saida | Acao | Destino |
+|---|---|---|
+| `Sim, pode` | aplicar `Consolidação 24h`; salvar `Aceita_Acompanhamento = Sim` se existir | `Visitante / Acompanhamento 24h` |
+| `Agora nao` | salvar `Aceita_Acompanhamento = Nao` se existir | mensagem curta -> `Encerrar Conversa` |
+| `Quero saber mais` | salvar `Ultima_Intencao = Visitante` | informacoes basicas -> `1- RUTE SECRETARIA` |
+| entrada invalida / limite de erro | repetir menu; apos 3 erros | `1- RUTE SECRETARIA` |
+| inatividade | lembrete curto | `Encerrar Conversa` |
+
+Regra:
+
+```text
+Nenhuma saida visual do menu pode ficar sem conexao.
+```
 
 ## Fluxo 2 - Atualizacao Cadastral Completa
 
@@ -477,7 +524,6 @@ Acoes:
 - Remover `Atualização Recusada`, se existir.
 - Definir `Status_Cadastro = Completo`.
 - Definir `Ultima_Atualiz_Cadas = data atual`.
-- Inscrever em `SEQ - Revisao Cadastral 6M`.
 - Inscrever em `SEQ - Recadastro Anual`.
 - Opcional: webhook para Hermes salvar em `database/pastoral.db`.
 
@@ -487,7 +533,7 @@ Mensagem:
 Cadastro atualizado com sucesso. Muito obrigado! Deus abencoe sua vida.
 ```
 
-## Fluxo 2A - Confirmacao Cadastral Semestral
+## Fluxo 2A - Recadastro Anual
 
 Objetivo:
 
@@ -556,7 +602,7 @@ Logica:
 
 Objetivo:
 
-Receber visitante e garantir consolidacao em ate 24h.
+Receber visitante e garantir acompanhamento em ate 24h.
 
 Blocos:
 
@@ -579,13 +625,13 @@ Acoes:
 
 - Aplicar `Visitante`.
 - Aplicar `Consolidação 24h`.
-- Notificar admin/departamento consolidacao.
+- Notificar admin/equipe interna de acompanhamento.
 - Inscrever em `SEQ - Follow-up Visitante 24h`.
-- Opcional: abrir atendimento para departamento `Consolidacao`.
+- Opcional: abrir atendimento para equipe interna responsavel pelo acompanhamento.
 
 IA:
 
-- Usar Caleb se a conversa for aberta sobre celula/consolidacao.
+- Usar Caleb se a conversa for aberta sobre celula ou acompanhamento.
 - Para cadastro basico, preferir botoes e salvar campo.
 
 ## Fluxo 4 - Mensagem Padrao IA RUTE
@@ -766,21 +812,6 @@ Ao concluir cadastro:
 
 - Remover contato dessa sequencia, se BotConversa permitir no fluxo.
 
-### `SEQ - Revisao Cadastral 6M`
-
-Uso:
-
-- Apos concluir cadastro/confirmacao.
-
-Configuracao ideal:
-
-- Aguardar 180 dias.
-- Enviar fluxo `Confirmacao Cadastral Semestral`.
-
-Observacao:
-
-Se o BotConversa nao permitir espera de 180 dias com estabilidade ou remocao/reativacao fina, usar Hermes como agendador externo e API `send_flow`.
-
 ### `SEQ - Recadastro Anual`
 
 Uso:
@@ -836,13 +867,11 @@ Rotina Hermes recomendada:
 
 1. Buscar contatos do BotConversa.
 2. Ler etiquetas e campos.
-3. Se membro com `Cadastro Completo` e `Ultima_Atualiz_Cadas` > 180 dias:
+3. Se membro com `Cadastro Completo` e `Ultima_Atualiz_Cadas` > 365 dias:
    - Remover `Atualização Cadastral`.
    - Aplicar `Atualização Pendente`.
-   - Enviar fluxo `Confirmacao Cadastral Semestral`.
-4. Se `Ultima_Atualiz_Cadas` > 365 dias:
-   - Enviar `Recadastro Anual`.
-5. Atualizar dashboard local.
+   - Enviar fluxo `Recadastro Anual`.
+4. Atualizar dashboard local.
 
 ## Webhooks e sincronizacao Hermes
 
@@ -882,9 +911,9 @@ Se o BotConversa nao permitir variaveis exatamente com estes nomes, ajustar no p
 2. Criar campos faltantes.
 3. Padronizar nomes de campos no Hermes/dashboard.
 4. Criar sequencias.
-5. Criar fluxos auxiliares: `Confirmacao Cadastral Semestral`, `Recadastro Anual`, `Pedido de Oracao`, `Pedido de Aconselhamento`, `G12 e Celulas`, `Ministerios`.
-6. Ajustar `Boas Vindas Filadelfia` para roteamento por etiquetas.
-7. Ajustar `Mensagem Padrão - IA RUTE` para checar cadastro antes da IA.
+5. Criar fluxos auxiliares: `Recadastro Anual`, `Pedido de Oracao`, `Pedido de Aconselhamento`, `G12 e Celulas`, `Ministerios`.
+6. Ajustar `0- Boas Vindas Filadelfia` para roteamento por etiquetas.
+7. Ajustar `1- RUTE SECRETARIA` para checar cadastro antes da IA.
 8. Adicionar webhooks de sincronizacao nos finais.
 9. Testar com contatos ficticios:
    - visitante novo;

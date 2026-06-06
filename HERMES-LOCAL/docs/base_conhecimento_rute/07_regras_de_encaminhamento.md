@@ -15,7 +15,7 @@ A Rute nao deve resolver tudo em conversa livre. Ela deve identificar a intencao
 
 | Intencao | Sinais | Acao |
 |---|---|---|
-| `Atualizacao_Cadastral` | atualizar cadastro, meus dados, mudei telefone/endereco/celula, quero corrigir cadastro | Enviar para `Fluxo 2A - Confirmacao Cadastral Semestral` ou fluxo completo de cadastro |
+| `Atualizacao_Cadastral` | atualizar cadastro, meus dados, mudei telefone/endereco/celula, quero corrigir cadastro | Enviar para `Atualização Cadastral` se faltar cadastro, ou `Recadastro Anual` se for conferência anual |
 | `Visitante` | primeira vez, quero conhecer, horario do culto, onde fica, posso ir | Enviar para `VISITANTE` |
 | `Pedido_Oracao` | ore por mim, pedido de oracao, intercessao | Registrar pedido e encaminhar intercessao |
 | `Aconselhamento` | quero falar com pastor/pastora, aconselhamento, crise, conflito, casamento, denuncia, ajuda sensivel | Abrir atendimento humano |
@@ -44,6 +44,8 @@ Precisa_Encaminhar = Sim
 ```text
 Graça e Paz! Sera uma alegria receber voce. Vou te encaminhar para nosso atendimento de visitantes.
 ```
+
+Ao falar com visitante, evitar a palavra "consolidador". Usar "alguem da nossa igreja", "uma pessoa da nossa equipe" ou "um amigo proximo para te acompanhar".
 
 Campos:
 
@@ -116,4 +118,3 @@ Resposta:
 ```text
 Graça e Paz! Ainda nao tenho essa informacao confirmada por aqui. Vou encaminhar para a secretaria/lideranca responder com seguranca.
 ```
-
